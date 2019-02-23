@@ -17,13 +17,13 @@ class vehicle_info(models.Model):
 
     def __str__(self):
         vehicle_str = '''
-        battery: %s
-        carNum: %s
-        camera: %s
-        lidar: %s
-        radar: %s
-        rtk: %s
-        ''',(self.battery, self.carNum, self.carNum, self.lidar, self.radar, self.rtk)
+        battery: {}
+        carNum: {}
+        camera: {}
+        lidar: {}
+        radar: {}
+        rtk: {}
+        '''.format(self.battery, self.carNum, self.carNum, self.lidar, self.radar, self.rtk)
         return vehicle_str
 
 class vehicle_task(models.Model):
@@ -41,7 +41,8 @@ class vehicle_task(models.Model):
     pass
 
 class app_info(models.Model):
-    pid = models.AutoField(primary_key=True)
+    # pid = models.AutoField(primary_key=True)
+    pid = models.IntegerField(primary_key=True)
     pwd = models.SlugField()
 
     pass

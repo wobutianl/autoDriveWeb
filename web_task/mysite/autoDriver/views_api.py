@@ -1,48 +1,127 @@
 from django.shortcuts import render
+from . import models
 
 from django.http import HttpResponse
+from . import utils
+from . import driveArea
+import param
 
 def index2(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
 
 def updateApp(request, pid, lon, lat, tasktype, taskstatus):
-    print(pid, lon, lat, tasktype, taskstatus)
-
+    try:
+        res = models.app_task.objects.filter( pid_id = pid )
+        # for row in res:
+        #     return HttpResponse(row.pid)
+        if len(res) > 0:
+            models.app_task.objects.filter(pid_id =pid).update(taskType = tasktype, taskStatus = taskstatus,
+                                                           lon = lon, lat = lat )
+        else:
+            models.app_task.objects.create(pid_id = pid, taskType = tasktype, taskStatus = taskstatus,
+                                                           lon = lon, lat = lat)
+        result = '{' + param.conformMsg.format(0, 0) + '}'
+        return HttpResponse(result)
+    except :
+        result = '{' + param.conformMsg.format(0, 2) + '}'
+        return HttpResponse( result)
     pass
 
-def setStartTask(request, pid, startlon, startlat, endlon, endlat):
-    print(pid, startlat)
+def startTask(request, pid, startlon, startlat, endlon, endlat):
+    '''
+    same area:  
+    several area:
+    inWhichArea(startlon, startlat)
+    bDiffArea = False
+    '''
+    startArea = utils.inWhichArea(startlat, startlon)
+    endArea = utils.inWhichArea(endlat, endlon)
+    if startArea == 0 or endArea == 0 :
+        result = '{' + param.conformMsg.format(0, 1) + '}'
+        return HttpResponse(result)
+    elif startArea == endArea:
+        # insert into task_info
+        try :
+            models.task_info.objects.create(pid_id=pid, startlon = startlon, startlat = startlat,
+                                            endlon = endlon, endlat = endlat, taskType = 1,
+                                            taskStatus = 0)
+            result = '{' + param.conformMsg.format(0, 0) + '}'
+            return HttpResponse(result)
+        except:
+            result = '{' + param.conformMsg.format(0, 1) + '}'
+            return HttpResponse(result)
+    else:
+        dockNum = utils.chooseDock(startlat , startlon, startArea)
+        transferPoints = [ driveArea.dockPoint[startArea-1][dockNum] ]
+        midLat = driveArea.dockPoint[startArea-1][dockNum].x
+        midLon = driveArea.dockPoint[startArea-1][dockNum].y
+        try :
+            models.task_info.objects.create(pid_id=pid, startlon = startlon, startlat = startlat,
+                                            endlon = midLon, endlat = midLat, taskType = 1,
+                                            taskStatus = 0, transferPoints = transferPoints,
+                                            current_task = True)
+            models.task_info.objects.create(pid_id=pid, startlon=midLon, startlat=midLat,
+                                            endlon=endlon, endlat=endlat, taskType=1,
+                                            taskStatus=0, transferPoints=transferPoints,
+                                            current_task=False)
+            result = '{' + param.conformMsg.format(0, 0) + '}'
+            return HttpResponse(result)
+        except:
+            result = '{' + param.conformMsg.format(0, 1) + '}'
+            return HttpResponse(result)
+        return
     pass
 
-def setParkTask(request, pid, vid):
+def parkTask(request, pid, carNum):
     pass
 
-def setLaunchTask(request, pid, vid):
+def launchTask(request, pid, carNum):
     pass
 
-def setCancelTask(request, pid):
+def cancelTask(request, pid):
     print(pid )
-    return HttpResponse("Hello, world. ", pid)
+    string  = "he {}".format( pid )
+    return HttpResponse(string)
     pass
 
-def setRegisterTask(request, pid, password):
+def registerTask(request, pid, password):
+    try:
+        # print(pid, password)
+        models.app_info.objects.create( pid = pid, pwd = password)
+        result = '{' + param.conformMsg.format(0, 0) + '}'
+        return HttpResponse(result)
+    except :
+        result = '{' + param.conformMsg.format(0,1 ) + '}'
+        return HttpResponse( result)
+
     pass
 
-def setLoginTask(request, pid, password):
+def loginTask(request, pid, password):
+    try:
+        res = models.app_info.objects.filter( pid = pid, pwd = password)
+        if len(res) > 0:
+            result = '{' + param.conformMsg.format(0, 0) + '}'
+            return HttpResponse(result)
+        else:
+            result = '{' + param.conformMsg.format(0, 1) + '}'
+            return HttpResponse(result)
+    except :
+        result = '{' + param.conformMsg.format(0, 2) + '}'
+        return HttpResponse( result)
     pass
 
-def getParkInfo(request, pid):
+def parkInfo(request, pid):
     pass
 
-def getUnStartInfo(request, pid):
+def unstartInfo(request, pid):
     pass
 
-def getVehicleInfo(request, pid, vid):
+def vehicleInfo(request, pid, carNum):
     pass
 
-def getVehicleIdInfo(request, pid):
+def vehicleIdInfo(request, pid):
     pass
 
-def haveGetMsg(request, pid):
+def comformMsg(request, pid):
     pass
