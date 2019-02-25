@@ -18,4 +18,5 @@ urlpatterns = [
     path('/api/vehicleinfo/<int:pid>/<int:carNum>', views_api.vehicleInfo, name = "vehicleInfo"),
     path('/api/vehicleidinfo/<int:pid>', views_api.vehicleIdInfo, name = "vehicleIdInfo"),
     path('/api/comformmsg/<int:pid>', views_api.comformMsg, name = "comformMsg"),
+    path('/api/vehicleupdate/', views_api.updateVehicle, name = "updateVehicle"),
 ]

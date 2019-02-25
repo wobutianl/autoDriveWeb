@@ -27,3 +27,17 @@ def chooseDock( startlat, startlon, areaNum):
             dock_num = i
         i = i+1
     return dock_num
+
+
+def getTaskStatus(app_taskType, app_taskStatus, v_taskType, v_taskStatus):
+    taskType = 0
+    taskStatus = 0
+    if app_taskType > v_taskType:
+        taskType = app_taskType
+    elif app_taskType == v_taskType:
+        if app_taskStatus >= v_taskStatus :
+            taskStatus = app_taskStatus
+        elif app_taskStatus < v_taskStatus:
+            taskStatus = v_taskStatus
+    return (taskType, taskStatus)
+    pass
