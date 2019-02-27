@@ -1,5 +1,5 @@
-conformMsg = ''' 'server':{}, 'result':{} '''
-webToVehicle = ''' 'tid':{},'taskType':{}, 'taskStatus':{}, 'lat':{}, 'lon':{} '''
+conformMsg = ''' 'result':{} '''
+webToVehicle = ''' 'tid':{}, 'lat':{}, 'lon':{} '''
 
 RESERVER_TYPE = 1
 GO_TYPE = 2
