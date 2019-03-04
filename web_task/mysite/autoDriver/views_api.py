@@ -27,9 +27,27 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
             get 2,1,beSure=False, let car start 
             get 2,4, (one task : then change task status)
                      (two task : change two of the task )
-        '''
+        ''' 
         if tasktype == 1 and taskstatus == 0:
+            res = models.task_info.objects.filter( pid_id = pid, endStatus=0, taskStatus=0 )
+            if len(res) > 0 :
+                result = '{' + param.conformMsg.format( 0) + '}'
+            else :
+                res = models.task_info.objects.filter(pid_id=pid, endStatus=0, taskStatus=1)
 
+                taskList = []
+                if len(res) >1:
+                    for t in res :
+                        veh_res = models.vehicle_task.objects.filter(carNum_id = t.carNum_id)
+                        taskListJson = param.taskListJson.format(t.current_task,
+                                                                 t.carNum_id, t.taskType, t.taskStatus,
+                                                                 veh_res[0].lon, veh_res[0].lat,
+                                                                 veh_res[0].estimateTime, veh_res[0].odometry
+                                                                 , [])
+                        taskList.append(taskListJson)
+                elif len(res ) == 1:
+                    
+                    pass
             pass
         if tasktype == 2 and taskstatus == 4:
             # if have_other_task():  changedTask()
@@ -37,7 +55,7 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
     else:
         models.app_task.objects.create(pid_id = pid, lon = lon, lat = lat)
 
-    result = '{' + param.conformMsg.format( 0) + '}'
+    # result = '{' + param.conformMsg.format( 0) + '}'
     return HttpResponse(result)
     # except :
     #     result = '{' + param.conformMsg.format(0, 2) + '}'

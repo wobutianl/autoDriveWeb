@@ -1,6 +1,9 @@
 conformMsg = ''' 'result':{} '''
 webToVehicle = ''' 'tid':{}, 'lat':{}, 'lon':{} '''
 
+webToApp = ''' 'transferPoint':{}, 'taskList':{}  '''
+taskListJson = ''' 'CurrentTask':{}, 'carNum': {}, 'taskType':{}, 'taskStatus':{}, 'lon':{}, 'lat':{}, 'estimateTime':{}, 'odometry':{}, 'path':{} '''
+
 RESERVER_TYPE = 1
 GO_TYPE = 2
 
