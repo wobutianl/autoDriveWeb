@@ -19,7 +19,7 @@ for sensor : when sensor changed
 '''
 def update(request, carNum, vehicleType, available, lon, lat, haveTask, battery, estimateTime, odometry):
     v_res = models.vehicle_info.objects.filter( carNum = carNum, vehicleType=vehicleType)
-    if len(v_res==0): # register in db
+    if len(v_res) == 0: # register in db
         models.vehicle_info.objects.create(carNum=carNum, vehicleType = vehicleType)
     else:   # have msg in task table or not
         res = models.vehicle_task.objects.filter( carNum_id = v_res[0].carNum )
@@ -39,8 +39,6 @@ def update(request, carNum, vehicleType, available, lon, lat, haveTask, battery,
             else:
                 models.vehicle_task.objects.filter(carNum_id=res[0].carNum).update(
                     lon=lon, lat=lat, available=available, battery=battery )
-                # if vid have task in task table
-                # send task to vehicle
         else:
             models.vehicle_task.objects.create(carNum_id =v_res[0].carNum,
                                          lon=lon, lat=lat, available=available,
@@ -103,7 +101,8 @@ def arrival(request, carNum, vehicleType):
     v_res = models.vehicle_info.objects.filter(carNum=carNum, vehicleType=vehicleType)
     if len(v_res) > 0:
         # update task table
-        models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=4, endTime=datetime.now() )
+        models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=4
+                                                                    , endTime=datetime.now() )
         result = '{' + param.conformMsg.format(0) + '}'
         return HttpResponse(result)
         pass
