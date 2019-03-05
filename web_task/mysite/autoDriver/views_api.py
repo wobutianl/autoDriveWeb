@@ -22,9 +22,12 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
         models.app_task.objects.filter( pid_id=pid ).update(lon=lon, lat=lat)
         '''
         have task : 
-            get 1,0, to know all the task have car prepared
-            get 1,1,beSure=False, then tell car to start 
-            get 2,1,beSure=False, let car start 
+            get 1,0, check car getTask, if get return 1,1 else return 0
+            get 1,1, check car prepared , return 1,2 and taskList
+            get 1,2, check car status , return 1, 3
+            get 1,3, check car status ,
+            get 1,4, return 0
+            get 2,0, check car getTask, if get return 1,1 else return 0
             get 2,4, (one task : then change task status)
                      (two task : change two of the task )
         ''' 
@@ -53,6 +56,7 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
             # if have_other_task():  changedTask()
             pass
     else:
+        # need create app task 
         models.app_task.objects.create(pid_id = pid, lon = lon, lat = lat)
 
     # result = '{' + param.conformMsg.format( 0) + '}'
@@ -148,7 +152,35 @@ def register(request, pid, password):
 
 def userLogin(request, pid, password):
     try:
-        res = models.app_info.objects.filter( pid = pid, pwd = password)
+        res = models.app_info.objects.filter( pid = pid, pwd = password, ptype = 1)
+        if len(res) > 0:
+            result = '{' + param.conformMsg.format( 0) + '}'
+            return HttpResponse(result)
+        else:
+            result = '{' + param.conformMsg.format(1) + '}'
+            return HttpResponse(result)
+    except :
+        result = '{' + param.conformMsg.format(2) + '}'
+        return HttpResponse( result)
+    pass
+
+def adminLogin(request, pid, password):
+    try:
+        res = models.app_info.objects.filter( pid = pid, pwd = password, ptype=2)
+        if len(res) > 0:
+            result = '{' + param.conformMsg.format( 0) + '}'
+            return HttpResponse(result)
+        else:
+            result = '{' + param.conformMsg.format(1) + '}'
+            return HttpResponse(result)
+    except :
+        result = '{' + param.conformMsg.format(2) + '}'
+        return HttpResponse( result)
+    pass
+
+def taskQuery(request, pid ):
+    try:
+        res = models.app_info.objects.filter( pid = pid)
         if len(res) > 0:
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)

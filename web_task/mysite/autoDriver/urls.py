@@ -18,12 +18,12 @@ urlpatterns = [
     path('/api/app/unstartinfo/<int:pid>', views_api.unstartInfo, name = "unstartInfo"),
     path('/api/app/vehicleinfo/<int:pid>/<int:carNum>', views_api.vehicleInfo, name = "vehicleInfo"),
     path('/api/app/vehiclelist/<int:pid>', views_api.vehicleList, name = "vehicleList"),
-    # path('/api/app/comformmsg/<int:pid>', views_api.comformMsg, name = "comformMsg"),
+    path('/api/app/taskquery/<int:pid>', views_api.taskQuery, name = "comformMsg"),
 
     ##############  vehicle #######
-    path('/api/vehicle/update/', views_vehicle.update, name = "updateVehicle"),
-    path('/api/vehicle/gettask/', views_vehicle.getTask, name = "vehicleGetTask"),
-    path('/api/vehicle/begin/', views_vehicle.begin, name = "vehicleBegin"),
-    path('/api/vehicle/run/', views_vehicle.run, name = "vehicleRun"),
-    path('/api/vehicle/arrival/', views_vehicle.arrival, name = "vehicleArrival"),
+    path('/api/vehicle/update/<str:carnum>/<int:vehicletype>/<int:available>/<str:lon>/<str:lat>/<int:havetask>/<str:battery>/<str:estimatetime>/<str:odometry>', views_vehicle.update, name = "updateVehicle"),
+    path('/api/vehicle/gettask/<str:carnum>/<int:vehicletype>/', views_vehicle.getTask, name = "vehicleGetTask"),
+    path('/api/vehicle/begin/<str:carnum>/<int:vehicletype>/', views_vehicle.begin, name = "vehicleBegin"),
+    path('/api/vehicle/run/<str:carnum>/<int:vehicletype>/', views_vehicle.run, name = "vehicleRun"),
+    path('/api/vehicle/arrival/<str:carnum>/<int:vehicletype>/', views_vehicle.arrival, name = "vehicleArrival"),
 ]

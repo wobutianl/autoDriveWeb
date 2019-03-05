@@ -24,28 +24,31 @@ class vehicle_task(models.Model):
     battery = models.FloatField(default=0.0)
     estimateTime = models.FloatField(default=0.0)
     odometry = models.FloatField(default=0.0)
+    endTime = models.DateTimeField()
+    haveTask = models.BooleanField(default=False)
 
     pass
 
 class app_info(models.Model):
     # pid = models.AutoField(primary_key=True)
-    cellNum = models.IntegerField(primary_key=True)
+    pid = models.IntegerField(primary_key=True)
     pwd = models.SlugField()
+    ptype = models.IntegerField(default=0)  # 0: user , 1: admin
     pass
 
 class app_task(models.Model):
-    cellNum = models.ForeignKey(app_info, on_delete=models.CASCADE )
+    pid = models.ForeignKey(app_info, on_delete=models.CASCADE )
     lon = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
 
     def __str__(self):
-        return "taskType: " + self.taskType + "  taskStatus: " + self.taskStatus
+        return 'pid' + self.pid 
 
     pass
 
 class task_info(models.Model):
     carNum = models.ForeignKey(vehicle_info, on_delete=models.CASCADE )
-    cellNum = models.ForeignKey(app_info, on_delete=models.CASCADE )
+    pid = models.ForeignKey(app_info, on_delete=models.CASCADE )
     tid = models.AutoField(primary_key=True)
     startlon = models.FloatField(default=0.0)
     startlat = models.FloatField(default=0.0)
@@ -58,7 +61,7 @@ class task_info(models.Model):
     taskType = models.IntegerField(default=0)
     taskStatus = models.IntegerField(default=0)
     endStatus = models.IntegerField(default=0)
-    beSured = models.BooleanField(default=False)  # have vehicle get the task
+    # beSured = models.BooleanField(default=False)  # have vehicle get the task
 
     def __str__(self):
         return self.tid + " " + self.startlon + " " + self.startlat + " " + self.endlon + " " + self.endlat
