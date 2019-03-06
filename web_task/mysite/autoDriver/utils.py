@@ -5,16 +5,18 @@ from . import driveArea
 def inWhichArea( lat, lon ):
     p = Point(lat, lon)
     if p.within(driveArea.areaA):
+        print(1)
         return 1
     elif p.within(driveArea.areaB):
+        print(2)
         return 2
     else:
         return 0
     pass
 
-def chooseDock( startlat, startlon, areaNum):
+def chooseDock( lat, lon, areaNum):
     # just care about the distance from begin point to dock
-    sp = Point(startlat, startlon)
+    sp = Point(lat, lon)
     if areaNum == 1:
         points = driveArea.dockPoint[0]
     elif areaNum == 2:
