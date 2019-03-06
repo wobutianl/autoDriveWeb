@@ -18,29 +18,29 @@ for task : when there have a task
 for sensor : when sensor changed 
 '''
 def update(request, carNum, vehicleType, available, lon, lat, haveTask, battery, estimateTime, odometry):
-    v_res = models.vehicle_info.objects.filter( carNum = carNum, vehicleType=vehicleType)
+    v_res = models.vehicle_info.objects.filter( car_num = carNum, vehicle_type=vehicleType)
     if len(v_res) == 0: # register in db
-        models.vehicle_info.objects.create(carNum=carNum, vehicleType = vehicleType)
+        models.vehicle_info.objects.create(car_num=carNum, vehicle_type = vehicleType)
     else:   # have msg in task table or not
-        res = models.vehicle_task.objects.filter( carNum_id = v_res[0].carNum )
+        res = models.vehicle_task.objects.filter( car_num_id = v_res[0].car_num )
         if len(res) > 0:
             if haveTask :
-                models.vehicle_task.objects.filter( carNum_id = res[0].carNum).update(
+                models.vehicle_task.objects.filter( car_num_id = res[0].car_num).update(
                      lon=lon, lat=lat,available = available, battery=battery,
-                    estimateTime=estimateTime, odometry=odometry , haveTask = True)
-            elif res[0].haveTask == True:
+                    estimate_time=estimateTime, odometry=odometry , have_task = True)
+            elif res[0].have_task == True:
                 cur_time = datetime.now()
                 if (cur_time - res[0].endTime).seconds > 120:
-                    models.vehicle_task.objects.filter(carNum_id=res[0].carNum).update(
-                        lon=lon, lat=lat, available=available, battery=battery, haveTask = False )
+                    models.vehicle_task.objects.filter(car_num_id=res[0].car_num).update(
+                        lon=lon, lat=lat, available=available, battery=battery, have_task = False )
                 else:
-                    models.vehicle_task.objects.filter(carNum_id=res[0].carNum).update(
+                    models.vehicle_task.objects.filter(car_num_id=res[0].car_num).update(
                         lon=lon, lat=lat, available=available, battery=battery )
             else:
-                models.vehicle_task.objects.filter(carNum_id=res[0].carNum).update(
+                models.vehicle_task.objects.filter(car_num_id=res[0].car_num).update(
                     lon=lon, lat=lat, available=available, battery=battery )
         else:
-            models.vehicle_task.objects.create(carNum_id =v_res[0].carNum,
+            models.vehicle_task.objects.create(car_num_id =v_res[0].car_num,
                                          lon=lon, lat=lat, available=available,
                                          battery=battery )
 
@@ -51,7 +51,7 @@ def update(request, carNum, vehicleType, available, lon, lat, haveTask, battery,
 
 # get the task : 1,1
 def getTask(request, carNum, vehicleType):
-    v_res = models.vehicle_info.objects.filter(carNum=carNum, vehicleType=vehicleType)
+    v_res = models.vehicle_info.objects.filter(car_num=carNum, vehicle_type=vehicleType)
     if len(v_res) > 0:
         # update task table
         models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=1 )
@@ -71,11 +71,11 @@ def begin(request, carNum, vehicleType):
             estimateTime = value['estimateTime']
             odometry = value['odometry']
 
-    v_res = models.vehicle_info.objects.filter(carNum=carNum, vehicleType=vehicleType)
+    v_res = models.vehicle_info.objects.filter(car_num=carNum, vehicle_type=vehicleType)
     if len(v_res) > 0:
         # update task table
         models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=2,
-                                  path=path, estimateTime=estimateTime, odometry=odometry)
+                                  path=path, estimate_time=estimateTime, odometry=odometry)
         result = '{' + param.conformMsg.format(0) + '}'
         return HttpResponse(result)
         pass
@@ -85,7 +85,7 @@ def begin(request, carNum, vehicleType):
     pass
 
 def run(request, carNum, vehicleType):
-    v_res = models.vehicle_info.objects.filter(carNum=carNum, vehicleType=vehicleType)
+    v_res = models.vehicle_info.objects.filter(car_num=carNum, vehicle_type=vehicleType)
     if len(v_res) > 0:
         # update task table
         models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=3)
@@ -98,7 +98,7 @@ def run(request, carNum, vehicleType):
     pass
 
 def arrival(request, carNum, vehicleType):
-    v_res = models.vehicle_info.objects.filter(carNum=carNum, vehicleType=vehicleType)
+    v_res = models.vehicle_info.objects.filter(car_num=carNum, vehicle_type=vehicleType)
     if len(v_res) > 0:
         # update task table
         models.task_info.objects.filter(vid_id=v_res[0].vid).update(taskType=1, taskStatus=4
