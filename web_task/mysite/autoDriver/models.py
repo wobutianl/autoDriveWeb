@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+'''
 class vehicle_info(models.Model):
     vehicle_type = models.FloatField(default=0.0)
     car_num = models.TextField(primary_key=True)
@@ -15,17 +16,19 @@ class vehicle_info(models.Model):
     def __str__(self):
         vehicle_str = ''
         return vehicle_str
+'''
 
-class vehicle_task(models.Model):
-    car_num = models.ForeignKey( vehicle_info, on_delete=models.CASCADE )
+class vehicle_info(models.Model):
+    vehicle_type = models.IntegerField(default=1) # 1:park, 2:public
+    car_num = models.TextField(primary_key=True)
     lon = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
-    available = models.BooleanField(default=True)
+    available = models.IntegerField(default=0)
     battery = models.FloatField(default=0.0)
     estimate_time = models.FloatField(default=0.0)
     odometry = models.FloatField(default=0.0)
     # end_time = models.TextField()
-    have_task = models.BooleanField(default=False)
+    have_task = models.IntegerField(default=0)
 
     pass
 
@@ -46,8 +49,8 @@ class app_task(models.Model):
     pass
 
 class task_info(models.Model):
-    car_num = models.ForeignKey(vehicle_info, on_delete=models.CASCADE )
-    pid = models.ForeignKey(app_info, on_delete=models.CASCADE )
+    car_num = models.TextField( max_length= 128 )
+    pid = models.IntegerField(default=0 )
     tid = models.AutoField(primary_key=True)
     start_lon = models.FloatField(default=0.0)
     start_lat = models.FloatField(default=0.0)

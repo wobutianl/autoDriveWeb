@@ -1,6 +1,6 @@
 from shapely.geometry import Polygon, Point
 from . import driveArea
-
+from datetime import datetime
 
 def inWhichArea( lat, lon ):
     p = Point(lat, lon)
@@ -44,3 +44,7 @@ def getTaskStatus(app_taskType, app_taskStatus, v_taskType, v_taskStatus):
             taskStatus = v_taskStatus
     return (taskType, taskStatus)
     pass
+
+
+def str2datetime(dateTime):
+    return datetime.strptime( dateTime ,"%Y-%m-%d %H:%M:%S.%f")
