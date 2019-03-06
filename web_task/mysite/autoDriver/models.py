@@ -27,7 +27,7 @@ class vehicle_info(models.Model):
     battery = models.FloatField(default=0.0)
     estimate_time = models.FloatField(default=0.0)
     odometry = models.FloatField(default=0.0)
-    # end_time = models.TextField()
+    end_time = models.TextField(default='0')
     have_task = models.IntegerField(default=0)
 
     pass

@@ -61,7 +61,7 @@ def makeTaskList( pid, taskType , taskStatus ):
         pass
     elif len(res) == 2:
         # if 1, 0 : car get prepared then 1,1, path else return 0, 0
-        if taskType in ( 1, 2)  and task_status == 0:
+        if taskType in ( 1, 2)  and taskStatus == 0:
             res = models.task_info.objects.filter(pid=pid, end_status=0, task_status = 0)
             if len(res) > 0:
                 for t in res:
@@ -96,22 +96,17 @@ def makeTaskList( pid, taskType , taskStatus ):
 
 def reserve(request, pid, startlon, startlat, endlon, endlat):
     '''
-    same area:  
-    several area:
-    inWhichArea(startlon, startlat)
-    bDiffArea = False
     '''
     startArea = utils.inWhichArea( float(startlat), float(startlon) )
     endArea = utils.inWhichArea( float(startlat), float(startlon) )
     if startArea == 0 or endArea == 0 :
-        result = '{' + param.conformMsg.format(1) + '}'
+        result = '{' + param.conformMsg.format(' not in the area ') + '}'
         return HttpResponse(result)
     elif startArea == endArea :
         # insert into task_info
         res = models.vehicle_info.objects.filter(available=1 , vehicle_type = startArea , battery__gt=50) # , battery__gt=50
         if len(res)>0:
         #try :
-            print(res[0].car_num == 'huA134')
             print(pid)
             models.task_info.objects.create(pid=int(pid), start_lon = startlon, start_lat = startlat,
                                             end_lon = endlon, end_lat = endlat, task_type = 1,
@@ -119,7 +114,7 @@ def reserve(request, pid, startlon, startlat, endlon, endlat):
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)
         else:
-            result = '{' + param.conformMsg.format( "s=e no suit car " + str(startArea) ) +  '}'
+            result = '{' + param.conformMsg.format( " s=e no suit car " + str(startArea) ) +  '}'
             return HttpResponse(result)
         #except:
         #    result = '{' + param.conformMsg.format( 1) + '}'
