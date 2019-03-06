@@ -168,34 +168,34 @@ def cancel(request, pid):
     pass
 
 def register(request, pid, password):
-    try:
+    #try:
         # print(pid, password)
-        models.app_info.objects.create( pid = pid, pwd = password)
-        result = '{' + param.conformMsg.format( 0) + '}'
-        return HttpResponse(result)
-    except :
-        result = '{' + param.conformMsg.format(1 ) + '}'
-        return HttpResponse( result)
+    models.app_info.objects.create( pid = pid, pwd = password, p_type=1)
+    result = '{' + param.conformMsg.format( 0) + '}'
+    return HttpResponse(result)
+    #except :
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
+    #    return HttpResponse( result)
 
     pass
 
 def userLogin(request, pid, password):
-    try:
-        res = models.app_info.objects.filter( pid = pid, pwd = password, ptype = 1)
-        if len(res) > 0:
-            result = '{' + param.conformMsg.format( 0) + '}'
-            return HttpResponse(result)
-        else:
-            result = '{' + param.conformMsg.format(1) + '}'
-            return HttpResponse(result)
-    except :
-        result = '{' + param.conformMsg.format(2) + '}'
-        return HttpResponse( result)
+    #try:
+    res = models.app_info.objects.filter( pid = pid, pwd = password, p_type = 1)
+    if len(res) > 0:
+        result = '{' + param.conformMsg.format( 0) + '}'
+        return HttpResponse(result)
+    else:
+        result = '{' + param.conformMsg.format(1) + '}'
+        return HttpResponse(result)
+    #except :
+    #    result = '{' + param.conformMsg.format(2) + '}'
+    #    return HttpResponse( result)
     pass
 
 def adminLogin(request, pid, password):
     try:
-        res = models.app_info.objects.filter( pid = pid, pwd = password, ptype=2)
+        res = models.app_info.objects.filter( pid = pid, pwd = password, p_type=2)
         if len(res) > 0:
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)
