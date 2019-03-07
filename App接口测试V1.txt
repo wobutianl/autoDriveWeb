@@ -1,0 +1,143 @@
+ToAPP 接口测试
+	- 用户注册
+	- 用户登陆
+	- 管理员登陆
+	- 获取任务
+	- 预约任务
+	- 发车任务
+	- 第二次发车任务
+	- 取消任务
+	- 更新任务
+
+	1. 预约
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/reserve/<int:pid>/<str:startlon>/<str:startlat>/<str:endlon>/<str:endlat>
+	参数：
+	Pid: 手机号
+	Startlon: 起点经度
+	Startlat: 起点纬度
+	Endlon: 终点经度
+	Endlat: 终点纬度
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	2. 注册
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/register/<int:pid>/<str:password>
+	参数：
+	Pid: 手机号
+	Password: 密码
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	3. 登陆
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/userlogin/<int:pid>/<str:password>
+	参数：
+	Pid: 手机号
+	Password: 密码
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	4. 管理员登陆
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/adminlogin/<int:pid>/<str:password>
+	参数：
+	Pid: 手机号
+	Password: 密码
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	5. 获取任务
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/taskquery/<int:pid>
+	参数：
+	Pid: 手机号
+	返回结果：
+	{result : n，taskList: [] }
+	N = 0 : 成功
+	N = 1: 失败
+	taskList: 任务列表
+	6. 发车任务
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/run/<int:pid>
+	参数：
+	Pid: 手机号
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	7. 第二次发车
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/run/<int:pid>
+	参数：
+	Pid: 手机号
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	8. 取消任务
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/cancel/<int:pid>
+	参数：
+	Pid: 手机号
+	返回结果：
+	{result : n}
+	N = 0 : 成功
+	N = 1: 失败
+	9. 更新
+	接口： 
+	http://120.26.226.18:9090/autodrive/api/app/update/<int:pid>/<str:lon>/<str:lat>/<int:tasktype>/<int:taskstatus>
+	参数：
+	Pid: 手机号
+	Lon: 用户当前经度
+	Lat: 用户当前纬度
+	taskType: 用户接收到的任务类型
+	taskStatus: 用户接收到的任务状态
+	返回结果：
+	{result : n, taskList [] }
+	N = 0 : 成功
+	N = 1: 失败
+	taskList: 任务列表（无任务时为空）,获取当前任务的TaskType, taskStatus 。
+	
+	
+	
+	
+1：测试流程
+- 注册
+http://120.26.226.18:9090/autodrive/api/app/register/110/110
+- 登陆
+http://120.26.226.18:9090/autodrive/api/app/userlogin/110/110
+- 预约
+http://120.26.226.18:9090/autodrive/api/app/reserve/110/31.12/121.12/31.22/121.23
+- 发车任务
+http://120.26.226.18:9090/autodrive/api/app/run/110
+- 获取任务
+http://120.26.226.18:9090/autodrive/api/app/taskquery/110
+- 更新任务 （0，0）- (2,4)
+http://120.26.226.18:9090/autodrive/api/app/update/110/31.22/121.23/0/0
+
+http://120.26.226.18:9090/autodrive/api/app/update/110/31.22/121.23/1/0
+
+
+
+2：车端测试
+更新
+http://120.26.226.18:9090/autodrive/api/vehicle/update/hu1234/1/1/121.1/31.1/0/60/0/0
+
+获取任务
+http://120.26.226.18:9090/autodrive/api/vehicle/gettask/hu1234/1/
+
+开始运行
+http://120.26.226.18:9090/autodrive/api/vehicle/begin/hu1234/1/
+
+正在运行
+http://120.26.226.18:9090/autodrive/api/vehicle/run/hu1234/1/
+
+到达 
+http://120.26.226.18:9090/autodrive/api/vehicle/arrival/hu1234/1/
+

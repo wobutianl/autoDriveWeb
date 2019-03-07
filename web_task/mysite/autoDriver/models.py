@@ -49,7 +49,7 @@ class app_task(models.Model):
     pass
 
 class task_info(models.Model):
-    car_num = models.TextField( max_length= 128 )
+    car_num = models.TextField( max_length= 128, unique=True )
     pid = models.IntegerField(default=0 )
     tid = models.AutoField(primary_key=True)
     start_lon = models.FloatField(default=0.0)
@@ -59,11 +59,10 @@ class task_info(models.Model):
     transfer_points = models.TextField(default='[]')
     path = models.TextField(default='[]')
 
-    current_task = models.BooleanField(default=True)
+    current_task = models.IntegerField(default=0)
     task_type = models.IntegerField(default=0)
     task_status = models.IntegerField(default=0)
     end_status = models.IntegerField(default=0)
-    # beSured = models.BooleanField(default=False)  # have vehicle get the task
 
     def __str__(self):
         return ''

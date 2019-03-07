@@ -21,30 +21,31 @@ def update(request, carnum, vehicletype, available, lon, lat, havetask, battery,
     v_res = models.vehicle_info.objects.filter( car_num = carnum, vehicle_type=vehicletype)
     if len(v_res) == 0: # register in db
         models.vehicle_info.objects.create(car_num=carnum, vehicle_type = vehicletype,lon=lon, lat=lat,available = available, battery=battery,
-                    estimate_time=estimatetime, odometry=odometry , have_task = False, end_time = '0' )
+                    estimate_time=estimatetime, odometry=odometry , have_task = 0, end_time = '0' )
     else:   # have msg in task table or not
         if havetask :
             models.vehicle_info.objects.filter( car_num=carnum ).update(
                     lon=lon, lat=lat,available = available, battery=battery,
-                estimate_time=estimatetime, odometry=odometry , have_task = True)
+                estimate_time=estimatetime, odometry=odometry , have_task = 1)
         elif v_res[0].have_task == True:
             cur_time = datetime.now()
             if (cur_time - utils.str2datetime(v_res[0].end_time) ).seconds > 120:
                 models.vehicle_info.objects.filter(car_num=carnum).update(
                     lon=lon, lat=lat, available=available, battery=battery, 
-                    estimate_time=0.0, odometry=0.0 ,have_task = False )
+                    estimate_time=0.0, odometry=0.0 ,have_task = 0 )
             else:
                 models.vehicle_info.objects.filter( car_num=carnum ).update(
                     lon=lon, lat=lat, available=available, battery=battery, estimate_time=0.0, odometry=0.0  )
         else:
             res = models.task_info.objects.filter( car_num = carnum, end_status=0, task_type=1, task_status=0)
             if len(res)>0:
-                result = {'lon':res[0].start_lon, 'lat': res[0].start_lat}
+                result = {'taskType = 1 :  lon': res[0].start_lon, 'lat': res[0].start_lat}
                 return HttpResponse(result)
             res = models.task_info.objects.filter(car_num=carnum, end_status=0, task_type=2, task_status=0)
             if len(res) > 0:
-                result = {'lon': res[0].end_lon, 'lat': res[0].end_lat}
+                result = {'taskType = 2: lon': res[0].end_lon, 'lat': res[0].end_lat}
                 return HttpResponse(result)
+
             models.vehicle_info.objects.filter( car_num=carnum ).update(
                 lon=lon, lat=lat, available=available, battery=battery , estimate_time=0.0, odometry=0.0 )
 
@@ -59,6 +60,7 @@ def getTask(request, carnum, vehicletype):
     if len(v_res) > 0:
         # update task table
         models.task_info.objects.filter(car_num = carnum).update(task_type=1, task_status=1 )
+        models.vehicle_info.objects.filter(car_num = carnum).update( have_task = 1 )
         result = '{' + param.conformMsg.format( 0) + '}'
         return HttpResponse(result)
         pass

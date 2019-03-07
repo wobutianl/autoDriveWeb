@@ -1,8 +1,8 @@
 conformMsg = ''' 'result':{} '''
 webToVehicle = ''' 'tid':{}, 'lat':{}, 'lon':{} '''
 
-webToApp = ''' 'transferPoint':{}, 'taskList':{}  '''
-taskListJson = ''' 'CurrentTask':{}, 'carNum': {}, 'taskType':{}, 'taskStatus':{}, 'lon':{}, 'lat':{}, 'estimateTime':{}, 'odometry':{}, 'path':{} '''
+webToApp = ''' 'result':{}, 'transferPoint':{}, 'taskList':{}  '''
+taskListJson = { 'currentTask':True, 'vid': '', 'taskType':0, 'taskStatus':0, 'lon':0, 'lat':0, 'estimateTime':0, 'odometry':0, 'path':[] }
 
 RESERVER_TYPE = 1
 GO_TYPE = 2
@@ -16,3 +16,12 @@ SQURE_CAR_TYPE = 1 # areaA , inside square
 OUTSIDE_CAR_TYPE = 2 # areaB, outside square
 
 
+current_task_name = 'currentTask'
+vid_name = 'vid'
+task_type_name = 'taskType'
+task_status_name = 'taskStatus'
+lon_name = 'lon'
+lat_name = 'lat'
+estimate_name = 'estimateTime'
+odometry_name = 'odometry'
+path_name = 'path'

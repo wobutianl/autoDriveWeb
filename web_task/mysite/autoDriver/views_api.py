@@ -45,53 +45,84 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
 
 def makeTaskList( pid, taskType , taskStatus ):
     # make a task list from task_info table
-    res = models.task_info.objects.filter(pid_id=pid, end_status=0)
+    res = models.task_info.objects.filter(pid=pid, end_status=0)
     result = param.webToApp
     transferPoints = res[0].transfer_points
     taskList = []
     if len(res) == 1:
+        print('have one task ' + res[0].car_num )
+        veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
+        taskjson = param.taskListJson
+        taskjson[param.current_task_name] = res[0].current_task
+        taskjson[param.vid_name] = res[0].car_num
+        taskjson[param.task_type_name] = res[0].task_type
+        taskjson[param.task_status_name] = res[0].task_status
+        taskjson[param.lon_name] = veh_res[0].lon
+        taskjson[param.lat_name] = veh_res[0].lat
+        taskjson[param.estimate_name] = veh_res[0].estimate_time
+        taskjson[param.odometry_name] = veh_res[0].odometry
+        taskjson[param.path_name] = res[0].path
 
-        veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num_id)
-        taskListJson = param.taskListJson.format(res[0].current_task,
-                                                 res[0].car_num_id, res[0].task_type, res[0].task_status,
-                                                 veh_res[0].lon, veh_res[0].lat,
-                                                 veh_res[0].estimate_time, veh_res[0].odometry
-                                                 , res[0].path)
-        taskList.append(taskListJson)
+
+        # taskListJson = param.taskListJson.format(res[0].current_task,
+        #                                          res[0].car_num, res[0].task_type, res[0].task_status,
+        #                                          veh_res[0].lon, veh_res[0].lat,
+        #                                          veh_res[0].estimate_time, veh_res[0].odometry
+        #                                          , res[0].path)
+        taskList.append(taskjson)
         pass
     elif len(res) == 2:
-        # if 1, 0 : car get prepared then 1,1, path else return 0, 0
+        print('have two task ')
+        # if 1, 0 : all the car get prepared then 1,1, path else return 0, 0
         if taskType in ( 1, 2)  and taskStatus == 0:
             res = models.task_info.objects.filter(pid=pid, end_status=0, task_status = 0)
             if len(res) > 0:
                 for t in res:
                     veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
-                    taskListJson = param.taskListJson.format(t.current_task,
-                                                             t.car_num, 1, 0,
-                                                             veh_res[0].lon, veh_res[0].lat,
-                                                             veh_res[0].estimate_time, veh_res[0].odometry
-                                                             , t.path)
-                    taskList.append(taskListJson)
+                    taskjson = param.taskListJson
+                    taskjson[param.current_task_name] = t.current_task
+                    taskjson[param.vid_name] = t.car_num
+                    taskjson[param.task_type_name] = 1
+                    taskjson[param.task_status_name] = 0 
+                    taskjson[param.lon_name] = veh_res[0].lon
+                    taskjson[param.lat_name] = veh_res[0].lat
+                    taskjson[param.estimate_name] = veh_res[0].estimate_time
+                    taskjson[param.odometry_name] = veh_res[0].odometry
+                    taskjson[param.path_name] = t.path
+                    
+                    taskList.append(taskjson)
             else:
                 for t in res:
                     veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
-                    taskListJson = param.taskListJson.format(t.current_task,
-                                                             t.car_num, t.task_type, t.task_status,
-                                                             veh_res[0].lon, veh_res[0].lat,
-                                                             veh_res[0].estimate_time, veh_res[0].odometry
-                                                             , t.path)
-                    taskList.append(taskListJson)
+                    taskjson = param.taskListJson
+                    taskjson[param.current_task_name] = t.current_task
+                    taskjson[param.vid_name] = t.car_num
+                    taskjson[param.task_type_name] = t.task_type
+                    taskjson[param.task_status_name] = t.task_status 
+                    taskjson[param.lon_name] = veh_res[0].lon
+                    taskjson[param.lat_name] = veh_res[0].lat
+                    taskjson[param.estimate_name] = veh_res[0].estimate_time
+                    taskjson[param.odometry_name] = veh_res[0].odometry
+                    taskjson[param.path_name] = t.path
+
+                    taskList.append(taskjson)
             pass
         else :
             for t in res:
-                veh_res = models.vehicle_into.objects.filter(car_num=t.car_num)
-                taskListJson = param.taskListJson.format(t.current_task,
-                                                         t.car_num, t.task_type, t.task_status,
-                                                         veh_res[0].lon, veh_res[0].lat,
-                                                         veh_res[0].estimate_time, veh_res[0].odometry
-                                                         , t.path )
-                taskList.append(taskListJson)
-    result = '{' +  result.format(transferPoints, taskList) + '}'
+                veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
+                taskjson = param.taskListJson
+                taskjson[param.current_task_name] = t.current_task
+                taskjson[param.vid_name] = t.car_num
+                taskjson[param.task_type_name] = t.task_type
+                taskjson[param.task_status_name] = t.task_status 
+                taskjson[param.lon_name] = veh_res[0].lon
+                taskjson[param.lat_name] = veh_res[0].lat
+                taskjson[param.estimate_name] = veh_res[0].estimate_time
+                taskjson[param.odometry_name] = veh_res[0].odometry
+                taskjson[param.path_name] = t.path
+
+                taskList.append(taskjson)
+    result = '{' +  result.format(0, transferPoints, taskList) + '}'
     return result
 
 def reserve(request, pid, startlon, startlat, endlon, endlat):
@@ -104,13 +135,13 @@ def reserve(request, pid, startlon, startlat, endlon, endlat):
         return HttpResponse(result)
     elif startArea == endArea :
         # insert into task_info
-        res = models.vehicle_info.objects.filter(available=1 , vehicle_type = startArea , battery__gt=50) # , battery__gt=50
+        res = models.vehicle_info.objects.filter(available=1 , vehicle_type = startArea , battery__gt=50, have_task=0 ) # , battery__gt=50
         if len(res)>0:
         #try :
             print(pid)
             models.task_info.objects.create(pid=int(pid), start_lon = startlon, start_lat = startlat,
                                             end_lon = endlon, end_lat = endlat, task_type = 1,
-                                            task_status = 0, car_num = res[0].car_num)
+                                            task_status = 0, current_task = 1, car_num = res[0].car_num)
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)
         else:
@@ -132,12 +163,12 @@ def reserve(request, pid, startlon, startlat, endlon, endlat):
             models.task_info.objects.create(pid=pid, start_lon = startlon, start_lat = startlat,
                                             end_lon = midLon, end_lat = midLat, task_type = 1,
                                             task_status = 0, transfer_points = transferPoints,
-                                            current_task = True, car_num = res[0].car_num )
+                                            current_task = 1, car_num = res[0].car_num )
 
             models.task_info.objects.create(pid=pid, start_lon=midLon, start_lat=midLat,
                                             end_lon=endlon, end_lat=endlat, task_type=1,
                                             task_status=0, transfer_points=transferPoints,
-                                            current_task=False, car_num = res[0].car_num )
+                                            current_task= 0, car_num = res[0].car_num )
             result = '{' + param.conformMsg.format(0) + '}'
             return HttpResponse(result)
         else:
@@ -163,19 +194,56 @@ def run(request, pid):
         else:
             result = '{' + param.conformMsg.format( 1) + '}'
             return HttpResponse(result)
-    pass
+    #except :
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
+    #    return HttpResponse( result)
 
 def park(request, pid, carNum):
+    # try:
+    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    if len(res) <= 0:
+        result = '{' + param.conformMsg.format(1) + '}'
+        return HttpResponse(result)
+    for row in res:
+        models.task_info.objects.filter(pid=pid, end_status=0).update(
+            task_type=3, task_status=0)
+        result = '{' + param.conformMsg.format( 0) + '}'
+        return HttpResponse(result)
+    #except :
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
+    #    return HttpResponse( result)
     pass
 
 def launch(request, pid, carNum):
+    # try:
+    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    if len(res) <= 0:
+        result = '{' + param.conformMsg.format(1) + '}'
+        return HttpResponse(result)
+    for row in res:
+        models.task_info.objects.filter(pid=pid, end_status=0).update(
+            task_type=5, task_status=0)
+        result = '{' + param.conformMsg.format( 0) + '}'
+        return HttpResponse(result)
+    #except :
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
+    #    return HttpResponse( result)
     pass
 
 def cancel(request, pid):
-    print(pid )
-    string  = "he {}".format( pid )
-    return HttpResponse(string)
-    pass
+    # try:
+    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    if len(res) <= 0:
+        result = '{' + param.conformMsg.format(1) + '}'
+        return HttpResponse(result)
+    for row in res:
+        models.task_info.objects.filter(pid=pid, end_status=0).update(
+            task_type=4, task_status=0)
+        result = '{' + param.conformMsg.format( 0) + '}'
+        return HttpResponse(result)
+    #except :
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
+    #    return HttpResponse( result)
 
 def register(request, pid, password):
     #try:
@@ -222,11 +290,12 @@ def taskQuery(request, pid ):
         # res = models.app_info.objects.filter( pid = pid)
         result = makeTaskList(pid, 0, 0)
     except :
-        result = '{' + param.conformMsg.format(2) + '}'
+        result = '{' + param.conformMsg.format(' no such user ') + '}'
     return HttpResponse( result)
     pass
 
 def parkInfo(request, pid):
+    # 可泊车辆信息 
     pass
 
 def unstartInfo(request, pid):
