@@ -1,4 +1,4 @@
-ToAPP 接口测试
+﻿ToAPP 接口测试
 	- 用户注册
 	- 用户登陆
 	- 管理员登陆
@@ -126,6 +126,16 @@ http://120.26.226.18:9090/autodrive/api/app/update/110/31.22/121.23/1/0
 
 
 2：车端测试
+- webToVehicle 
+{
+"result": 0,
+"task":{
+	"taskType":0,
+	"taskStatus":1,
+	"lon":0.0,
+	"lat":0.0
+	} 
+}
 更新
 http://120.26.226.18:9090/autodrive/api/vehicle/update/hu1234/1/1/121.1/31.1/0/60/0/0
 
@@ -147,6 +157,7 @@ http://120.26.226.18:9090/autodrive/api/vehicle/arrival/hu1234/1/
 #########################################################
 
 基于Get方式的整体测试流程
+http://localhost:8000/
 
 #########################################################
 # 前提
@@ -166,7 +177,7 @@ http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskTyp
 用户更新 1 0 	-》 得到 1 0		
 http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=1&taskStatus=0
 
-车端更新位置	-》 得到 1 0 
+车端更新位置	-》 得到 1 0 		发送起点位置
 http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=0&battery=60&estimateTime=0&odometry=0
 
 车端接收任务	-》 得到 result 0 	-》 服务端写入 1 1 , 车端 haveTask
@@ -178,29 +189,85 @@ http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskTyp
 用户更新 1 1 	-》 得到 1 1 		
 http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=1&taskStatus=1
 
-车端更新 haveTask	-》 得到 1 1
-
+车端更新 haveTask	-》 得到 1 1 才能发车
+http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=1&battery=60&estimateTime=0&odometry=0
 
 车端发车带Path	-》 得到 result0	-》 服务器写入 1 2
+http://localhost:8000/autodrive/api/vehicle/begin/
+{
+	"path":[(121.1,31,2),(121.3, 31.2),(121.4,31,4)],
+	"vid": "hu1234",
+	"vehicleType":1,
+	"estimateTime":5,
+	"odometry":5
+}
+
 用户更新 1 1 	-》 得到 1 2 taskList
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=1&taskStatus=1
+
 车端运行		-》 得到 result 0	-》 服务端写入 1 3
+http://localhost:8000/autodrive/api/vehicle/run/?vid=hu1234&vehicleType=1
+
 用户更新 1 2	-》 得到 1 3
-车端到达 		-》 得到 1 4 		-》 服务端写入 1 4
-车端更新haveTask-》	得到 1 4	
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=1&taskStatus=2
+
+车端到达 		-》 得到  		-》 服务端写入 1 4
+http://localhost:8000/autodrive/api/vehicle/arrival/?vid=hu1234&vehicleType=1
+
+车端更新no task	-》	得到 result 0	-》 服务端不变
+http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=0&battery=60&estimateTime=0&odometry=0
+
 用户出发任务	-》 得到 2 0 		-》 服务端写入 2 0
+http://localhost:8000/autodrive/api/app/run/?pid=111
+
 用户更新 1 4 	-》 得到 2 0		
-车端更新haveTask-》	得到 2 0		
-车端接收任务	-》	得到 2 1		-》 服务端更新 2 1
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=1&taskStatus=4
+
+
+车端更新no task	-》	得到 		-》 服务端设置 haveTask	 （ 发送目的地位置 ）
+http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=0&battery=60&estimateTime=0&odometry=0
+
+
+车端接收任务	-》	得到 		-》 服务端更新 2 1
+http://localhost:8000/autodrive/api/vehicle/gettask/?vid=hu1234&vehicleType=1
+
 用户更新 2 0	-》 得到 2 1		
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=2&taskStatus=0
+
 用户更新 2 1	-》 得到 2 1 
-车端更新haveTask-》	得到 2 1
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=2&taskStatus=1
+
+车端更新haveTask-》	得到 2 1 
+http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=1&battery=60&estimateTime=0&odometry=0
+
 车端发车带Path	-》 result 0		-》	服务端更新 2 2
+http://localhost:8000/autodrive/api/vehicle/begin/
+{
+	"path":[(121.1,31,2),(121.3, 31.2),(121.4,31,4)],
+	"vid": "hu1234",
+	"vehicleType":1,
+	"estimateTime":5,
+	"odometry":5
+}
+
+
 用户更新 2 1 	-》 得到 2 2 taskList
-车端到达		-》 result0			-》 服务端更新 2 4
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=2&taskStatus=1
+
+车端到达		-》 result0			-》 服务端更新 2 4  # 有问题， 可以直接到达 ，应该要一步步来
+http://localhost:8000/autodrive/api/vehicle/run/?vid=hu1234&vehicleType=1
+http://localhost:8000/autodrive/api/vehicle/arrival/?vid=hu1234&vehicleType=1
+
 用户更新 2 3	-》 得到 2 4
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=2&taskStatus=3
+
 车端更新 no task-》 得到 result 0 	-》 服务端保存车辆不可用状态2分钟
+http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&available=1&lon=121&lat=31&haveTask=0&battery=60&estimateTime=0&odometry=0
+
 用户更新 2 4	-》 得到 result 0 	-》 服务端更新任务为：完成
-车端更新 no task-》 得到 result 0 	-》 服务端保存车辆不可用状态2分钟
+http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskType=2&taskStatus=4
+
+车端更新 no task-》 得到 result 0 	-》 服务端保存车辆2分钟后 可用。
 
 
 # 双区域流程
@@ -227,3 +294,18 @@ http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskTyp
 车端更新haveTask-》	得到 2 1
 车端发车带Path	-》 result 0		-》	服务端更新 2 2
 
+# 同一用户多次下单测试
+在TaskInfo 表中Vid 要唯一
+检测Pid 不能超过两个
+
+# 同一车辆多次Begin测试
+检测状态不为 1/2 0 时不能调用这个接口
+
+# 多用户下单，只有一辆车
+让第一个成功，第二个失败
+
+# 路径在收到后要考虑删除？ 还是保留？
+
+# 2分钟 时间长度怎么判断 ？
+
+# 

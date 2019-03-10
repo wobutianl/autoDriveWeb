@@ -62,8 +62,24 @@ class task_info(models.Model):
     current_task = models.IntegerField(default=0)
     task_type = models.IntegerField(default=0)
     task_status = models.IntegerField(default=0)
-    end_status = models.IntegerField(default=0)
+    # end_status = models.IntegerField(default=0)
 
     def __str__(self):
         return ''
     pass
+
+class end_task_info(models.Model):
+    car_num = models.TextField( max_length= 128 )
+    pid = models.IntegerField(default=0 )
+    tid = models.AutoField(primary_key=True)
+    start_lon = models.FloatField(default=0.0)
+    start_lat = models.FloatField(default=0.0)
+    end_lon = models.FloatField(default=0.0)
+    end_lat = models.FloatField(default=0.0)
+    transfer_points = models.TextField(default='[]')
+    path = models.TextField(default='[]')
+
+    end_status = models.IntegerField(default=0)
+
+    def __str__(self):
+        return ''

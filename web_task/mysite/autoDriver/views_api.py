@@ -45,7 +45,7 @@ def update(request, pid, lon, lat, tasktype, taskstatus):
 
 def makeTaskList( pid, taskType , taskStatus ):
     # make a task list from task_info table
-    res = models.task_info.objects.filter(pid=pid, end_status=0)
+    res = models.task_info.objects.filter(pid=pid, ) # end_status=0
     result = param.webToApp
     transferPoints = res[0].transfer_points
     taskList = []
@@ -75,7 +75,7 @@ def makeTaskList( pid, taskType , taskStatus ):
         print('have two task ')
         # if 1, 0 : all the car get prepared then 1,1, path else return 0, 0
         if taskType in ( 1, 2)  and taskStatus == 0:
-            res = models.task_info.objects.filter(pid=pid, end_status=0, task_status = 0)
+            res = models.task_info.objects.filter(pid=pid, task_status = 0) # end_status=0, 
             if len(res) > 0:
                 for t in res:
                     veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
@@ -181,14 +181,14 @@ def reserve(request, pid, startlon, startlat, endlon, endlat):
 
 def run(request, pid):
     # try:
-    res = models.task_info.objects.filter(pid = pid, current_task = True, end_status=0)
+    res = models.task_info.objects.filter(pid = pid, current_task = True, ) # end_status=0
     if len(res) <= 0:
         result = '{' + param.conformMsg.format(1) + '}'
         return HttpResponse(result)
     for row in res:
         if row.task_type == 1 and row.task_status == 4:
-            models.task_info.objects.filter(pid=pid, current_task=True, end_status=0).update(
-                task_type=2, task_status=0)
+            models.task_info.objects.filter(pid=pid, current_task=True, ).update(
+                task_type=2, task_status=0)  # end_status=0
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)
         else:
@@ -200,13 +200,13 @@ def run(request, pid):
 
 def park(request, pid, carNum):
     # try:
-    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    res = models.task_info.objects.filter( pid = pid, ) # end_status=0 
     if len(res) <= 0:
         result = '{' + param.conformMsg.format(1) + '}'
         return HttpResponse(result)
     for row in res:
-        models.task_info.objects.filter(pid=pid, end_status=0).update(
-            task_type=3, task_status=0)
+        models.task_info.objects.filter(pid=pid, ).update(
+            task_type=3, task_status=0)  # end_status=0
         result = '{' + param.conformMsg.format( 0) + '}'
         return HttpResponse(result)
     #except :
@@ -216,13 +216,13 @@ def park(request, pid, carNum):
 
 def launch(request, pid, carNum):
     # try:
-    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    res = models.task_info.objects.filter( pid = pid,  ) # end_status=0
     if len(res) <= 0:
         result = '{' + param.conformMsg.format(1) + '}'
         return HttpResponse(result)
     for row in res:
-        models.task_info.objects.filter(pid=pid, end_status=0).update(
-            task_type=5, task_status=0)
+        models.task_info.objects.filter(pid=pid, ).update(
+            task_type=5, task_status=0) # end_status=0
         result = '{' + param.conformMsg.format( 0) + '}'
         return HttpResponse(result)
     #except :
@@ -232,13 +232,13 @@ def launch(request, pid, carNum):
 
 def cancel(request, pid):
     # try:
-    res = models.task_info.objects.filter( pid = pid, end_status=0 )
+    res = models.task_info.objects.filter( pid = pid,  ) # end_status=0
     if len(res) <= 0:
         result = '{' + param.conformMsg.format(1) + '}'
         return HttpResponse(result)
     for row in res:
-        models.task_info.objects.filter(pid=pid, end_status=0).update(
-            task_type=4, task_status=0)
+        models.task_info.objects.filter(pid=pid, ).update(
+            task_type=4, task_status=0) # end_status=0
         result = '{' + param.conformMsg.format( 0) + '}'
         return HttpResponse(result)
     #except :
@@ -246,30 +246,14 @@ def cancel(request, pid):
     #    return HttpResponse( result)
 
 
-# def register(request, pid, password):
-#     #try:
-#         # print(pid, password)
-#     models.app_info.objects.create( pid = pid, pwd = password, p_type=1)
-#     result = '{' + param.conformMsg.format( 0) + '}'
-#     return HttpResponse(result)
-#     #except :
-#     #    result = '{' + param.conformMsg.format(1 ) + '}'
-#     #    return HttpResponse( result)
-
-#     pass
-
-def register(request):
+def register(request, pid, password):
     #try:
         # print(pid, password)
-    if request.method=='GET':
-        pid = request.GET.get('pid',default='0')
-        password = request.GET.get('password',default='110')
-
-        models.app_info.objects.create( pid = pid, pwd = password, p_type=1)
-        result = '{' + param.conformMsg.format( 0 ) + '}'
-        return HttpResponse(result)
+    models.app_info.objects.create( pid = pid, pwd = password, p_type=1)
+    result = '{' + param.conformMsg.format( 0) + '}'
+    return HttpResponse(result)
     #except :
-    #    result = '{' + param.conformMsg.format( 1 ) + '}'
+    #    result = '{' + param.conformMsg.format(1 ) + '}'
     #    return HttpResponse( result)
 
     pass

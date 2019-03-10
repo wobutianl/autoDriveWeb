@@ -37,11 +37,11 @@ def update(request, carnum, vehicletype, available, lon, lat, havetask, battery,
                 models.vehicle_info.objects.filter( car_num=carnum ).update(
                     lon=lon, lat=lat, available=available, battery=battery, estimate_time=0.0, odometry=0.0  )
         else:
-            res = models.task_info.objects.filter( car_num = carnum, end_status=0, task_type=1, task_status=0)
+            res = models.task_info.objects.filter( car_num = carnum, task_type=1, task_status=0) # end_status=0, 
             if len(res)>0:
                 result = {'taskType = 1 :  lon': res[0].start_lon, 'lat': res[0].start_lat}
                 return HttpResponse(result)
-            res = models.task_info.objects.filter(car_num=carnum, end_status=0, task_type=2, task_status=0)
+            res = models.task_info.objects.filter(car_num=carnum, task_type=2, task_status=0) # end_status=0, 
             if len(res) > 0:
                 result = {'taskType = 2: lon': res[0].end_lon, 'lat': res[0].end_lat}
                 return HttpResponse(result)
