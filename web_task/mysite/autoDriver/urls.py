@@ -27,6 +27,7 @@ urlpatterns = [
     path('/api/app/reserve/', view_api_app.reserve, name="appReserve"),
     path('/api/app/parktask/', view_api_app.park, name = "appPark"),
     path('/api/app/run/', view_api_app.run, name = "appRun"),
+    path('/api/app/paid/', view_api_app.paid, name = "paid"),
 
     path('/api/app/launch/', view_api_app.launch, name = "appLaunch"),
     path('/api/app/userlogin/', view_api_app.userLogin, name = "userLogin"),

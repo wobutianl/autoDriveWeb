@@ -48,6 +48,8 @@ def update(request):
             get 2,4, (one task : then change task status)
                      (two task : change two of the task )
         ''' 
+        if taskType == 1 and taskStatus == 0:
+            models.app_task.filter(pid = pid).update(have_task = 1)
         result = makeTaskList(pid, taskType, taskStatus)
     else:
         # need create app task 
@@ -65,6 +67,7 @@ def makeTaskList( pid, taskType, taskStatus ):
     res = models.task_info.objects.filter(pid=pid) # end_status=0
     result = param.webToApp
     transferPoints = res[0].transfer_points
+    price = res[0].price
     taskList = []
     if len(res) == 1:
         print( str(taskStatus)  +  "    " + str(res[0].task_status) )
@@ -88,7 +91,8 @@ def makeTaskList( pid, taskType, taskStatus ):
             models.task_info.objects.filter(tid = res[0].tid).delete()
             models.end_task_info.objects.create(pid=res[0].pid, tid=res[0].tid, 
                 start_lon=res[0].start_lon, start_lat=res[0].start_lat, end_lon=res[0].end_lon, end_lat=res[0].end_lat, 
-                transfer_points=res[0].transfer_points, path=res[0].path, car_num=res[0].car_num, end_status=1)
+                transfer_points=res[0].transfer_points, path=res[0].path, car_num=res[0].car_num, end_status=1,
+                price = res[0].price)
             taskList.append([])
         else:
             print('have one task ' + res[0].car_num )
@@ -193,7 +197,7 @@ def makeTaskList( pid, taskType, taskStatus ):
                 taskjson[param.path_name] = [] #t.path
 
                 taskList.append(taskjson)
-    result = '{' +  result.format(0, transferPoints, taskList) + '}'
+    result = '{' +  result.format(0, transferPoints, taskList, price) + '}'
     return result
 
 def reserve(request):
@@ -209,6 +213,11 @@ def reserve(request):
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
 
+    p_res = models.app_task.objects.filter(have_task = 1)
+    if len(p_res) > 0:
+        result = '{' + param.conformMsg.format(' have task already ') + '}'
+        return HttpResponse(result)
+
     startArea = utils.inWhichArea( float(startLat), float(startLon) )
     endArea = utils.inWhichArea( float(startLat), float(startLon) )
     if startArea == 0 or endArea == 0 :
@@ -216,13 +225,17 @@ def reserve(request):
         return HttpResponse(result)
     elif startArea == endArea :
         # insert into task_info
-        res = models.vehicle_info.objects.filter(available=1 , vehicle_type = startArea , battery__gt=50, have_task=0 ) # , battery__gt=50
+        t_res = models.task_info.objects.values('car_num')
+        res = models.vehicle_info.objects.filter(available=1 , vehicle_type = startArea 
+            , battery__gt=50, have_task=0).exclude( car_num__in = t_res ) # , battery__gt=50
+        
         if len(res)>0:
         #try :
             print(pid)
             models.task_info.objects.create(pid=int(pid), start_lon = startLon, start_lat = startLat,
                                             end_lon = endLon, end_lat = endLat, task_type = 1,
-                                            task_status = 0, current_task = 1, car_num = res[0].car_num)
+                                            task_status = 0, current_task = 1, car_num = res[0].car_num,
+                                            price = 1)
             result = '{' + param.conformMsg.format( 0) + '}'
             return HttpResponse(result)
         else:
@@ -238,18 +251,19 @@ def reserve(request):
         midLon = driveArea.dockPoint[startArea-1][dockNum].y
         
         #try :
-        res_s = models.vehicle_info.objects.filter(available=True, vehicle_type = startArea, battery__gt=50 )
-        res_e = models.vehicle_info.objects.filter(available=True, vehicle_type = endArea, battery__gt=50 )
+        t_res = models.task_info.objects.values('car_num')
+        res_s = models.vehicle_info.objects.filter(available=True, vehicle_type = startArea, battery__gt=50 ).exclude( car_num__in = t_res )
+        res_e = models.vehicle_info.objects.filter(available=True, vehicle_type = endArea, battery__gt=50 ).exclude( car_num__in = t_res )
         if len(res_s)>0 and len(res_e) >0:
             models.task_info.objects.create(pid=pid, start_lon = startLon, start_lat = startLat,
                                             end_lon = midLon, end_lat = midLat, task_type = 1,
                                             task_status = 0, transfer_points = transferPoints,
-                                            current_task = 1, car_num = res[0].car_num )
+                                            current_task = 1, car_num = res[0].car_num, price = 2 )
 
             models.task_info.objects.create(pid=pid, start_lon=midLon, start_lat=midLat,
                                             end_lon=endLon, end_lat=endLat, task_type=1,
                                             task_status=0, transfer_points=transferPoints,
-                                            current_task= 0, car_num = res[0].car_num )
+                                            current_task= 0, car_num = res[0].car_num, price=2 )
             result = '{' + param.conformMsg.format(0) + '}'
             return HttpResponse(result)
         else:
@@ -458,6 +472,18 @@ def vehicleInfo(request):
         return HttpResponse(result)
 
     pass
+
+def paid(request):
+    if request.method == 'GET':
+        pid = request.GET.get('pid',default='0')
+        price = request.GET.get('price',default='0.0')
+
+        models.app_task.objects.filter(pid = pid).update(have_task = 0)
+
+    else :
+
+        result = '{' + param.conformMsg.format( ' request error ') + '}'
+        return HttpResponse(result)
 
 def vehicleList(request):
     if request.method == 'GET':

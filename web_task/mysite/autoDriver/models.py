@@ -1,4 +1,5 @@
 from django.db import models
+import jsonfield
 
 # Create your models here.
 
@@ -42,6 +43,8 @@ class app_task(models.Model):
     pid = models.ForeignKey(app_info, on_delete=models.CASCADE )
     lon = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
+    have_task = models.IntegerField(default=0)
+    
 
     def __str__(self):
         return 'pid' + self.pid 
@@ -57,7 +60,9 @@ class task_info(models.Model):
     end_lon = models.FloatField(default=0.0)
     end_lat = models.FloatField(default=0.0)
     transfer_points = models.TextField(default='[]')
-    path = models.TextField(default='[]')
+    path = jsonfield.JSONField()
+    # path = models.TextField(default=[])
+    price = models.FloatField(default=0.0)
 
     current_task = models.IntegerField(default=0)
     task_type = models.IntegerField(default=0)
@@ -78,6 +83,7 @@ class end_task_info(models.Model):
     end_lat = models.FloatField(default=0.0)
     transfer_points = models.TextField(default='[]')
     path = models.TextField(default='[]')
+    price = models.FloatField(default=0.0)
 
     end_status = models.IntegerField(default=0)
 

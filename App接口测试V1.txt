@@ -158,7 +158,7 @@ http://120.26.226.18:9090/autodrive/api/vehicle/arrival/hu1234/1/
 
 基于Get方式的整体测试流程
 http://localhost:8000/
-
+http://120.26.226.18:9090/
 #########################################################
 # 前提
 用户注册
@@ -195,7 +195,7 @@ http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&ava
 车端发车带Path	-》 得到 result0	-》 服务器写入 1 2
 http://localhost:8000/autodrive/api/vehicle/begin/
 {
-	"path":[(121.1,31,2),(121.3, 31.2),(121.4,31,4)],
+	"path":[{"lon":121.1, "lat":31.1},{"lon":121.2, "lat":31.2},{"lon":121.3, "lat":31.3}],
 	"vid": "hu1234",
 	"vehicleType":1,
 	"estimateTime":5,
@@ -243,7 +243,7 @@ http://localhost:8000/autodrive/api/vehicle/update/?vid=hu1234&vehicleType=1&ava
 车端发车带Path	-》 result 0		-》	服务端更新 2 2
 http://localhost:8000/autodrive/api/vehicle/begin/
 {
-	"path":[(121.1,31,2),(121.3, 31.2),(121.4,31,4)],
+	"path":[{"lon":121.1, "lat":31.1},{"lon":121.2, "lat":31.2},{"lon":121.3, "lat":31.3}],
 	"vid": "hu1234",
 	"vehicleType":1,
 	"estimateTime":5,
@@ -297,6 +297,7 @@ http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskTyp
 # 同一用户多次下单测试
 在TaskInfo 表中Vid 要唯一
 检测Pid 不能超过两个
+TODO：但还是存在，一个车可以发多个任务的情况。。。。？？？
 
 # 同一车辆多次Begin测试
 检测状态不为 1/2 0 时不能调用这个接口
@@ -308,4 +309,23 @@ http://localhost:8000/autodrive/api/app/update/?pid=111&lon=121&lat=31.1&taskTyp
 
 # 2分钟 时间长度怎么判断 ？
 
-# 
+# 定义支付完成接口：
+http://localhost:8000/autodrive/api/app/paid
+参数：
+pid : 用户ID
+price	:价格
+
+返回结果：
+result 0 
+
+
+# 增加一个价格字段 
+{
+result:
+transferPoints:
+taskList:[]
+price:
+}
+
+# path 格式
+path:[{lon:**, lat:**},{lon:**,lat:**}..]

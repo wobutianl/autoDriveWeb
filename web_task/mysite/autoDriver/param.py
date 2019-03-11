@@ -1,7 +1,7 @@
 conformMsg = ''' 'result':{} '''
 webToVehicle = ''' 'tid':{}, 'lat':{}, 'lon':{} '''
 
-webToApp = ''' 'result':{}, 'transferPoint':{}, 'taskList':{}  '''
+webToApp = ''' 'result':{}, 'transferPoint':{}, 'taskList':{}, 'price':{}  '''
 taskListJson = { 'currentTask':True, 'vid': '', 'taskType':0, 'taskStatus':0, 'lon':0, 'lat':0, 'estimateTime':0, 'odometry':0, 'path':[] }
 
 RESERVER_TYPE = 1

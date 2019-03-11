@@ -64,7 +64,7 @@ def update(request):
             if len(res)>0:
                 result = {'taskType = 1 :  lon': res[0].start_lon, 'lat': res[0].start_lat}
                 return HttpResponse( json.dumps(result) )
-                
+
             res = models.task_info.objects.filter(car_num=carNum, task_type=1, task_status=1) # end_status=0, 
             if len(res) > 0:
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status}
@@ -144,7 +144,7 @@ def begin(request):
     v_res = models.vehicle_info.objects.filter(car_num=carNum, vehicle_type=vehicleType)
     if len(v_res) > 0:
         # update task table
-        models.task_info.objects.filter(car_num=carNum).update( task_status=2, path=path)
+        models.task_info.objects.filter(car_num=carNum).update( task_status=2, path = path  ) 
         result = '{' + param.conformMsg.format(0) + '}'
         return HttpResponse(result)
         pass
