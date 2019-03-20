@@ -199,8 +199,11 @@ def reserve(request):
         pid = request.GET.get('pid',default='0')
         startLon = request.GET.get('startLon', default='0.0')
         startLat = request.GET.get('startLat', default='0.0')
+        startLon, startLat = utils.gcj2wgs( float(startLon), float(startLat))
+
         endLon = request.GET.get('endLon', default='0.0')
         endLat = request.GET.get('endLat', default='0.0')
+        endlon, endlat = utils.gcj2wgs( float(endLon), float(endLat) )
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
