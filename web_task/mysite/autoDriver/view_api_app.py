@@ -86,14 +86,6 @@ def makeTaskList( pid, taskType, taskStatus ):
             taskjson[param.path_name] = res[0].path
 
             taskList.append(taskjson)
-        elif int(taskType) == 2 and int(taskStatus) == 4:
-            print('have one task ' + res[0].car_num  + " end of the task ")
-            models.task_info.objects.filter(tid = res[0].tid).delete()
-            models.end_task_info.objects.create(pid=res[0].pid, tid=res[0].tid, 
-                start_lon=res[0].start_lon, start_lat=res[0].start_lat, end_lon=res[0].end_lon, end_lat=res[0].end_lat, 
-                transfer_points=res[0].transfer_points, path=res[0].path, car_num=res[0].car_num, end_status=1,
-                price = res[0].price)
-            taskList.append([])
         else:
             print('have one task ' + res[0].car_num )
             veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
@@ -106,7 +98,7 @@ def makeTaskList( pid, taskType, taskStatus ):
             taskjson[param.lat_name] = veh_res[0].lat
             taskjson[param.estimate_name] = veh_res[0].estimate_time
             taskjson[param.odometry_name] = veh_res[0].odometry
-            taskjson[param.path_name] = [] # res[0].path
+            taskjson[param.path_name] = res[0].path
 
             taskList.append(taskjson)
             
@@ -284,16 +276,16 @@ def run(request):
     # try:
     res = models.task_info.objects.filter(pid = pid, current_task = True,) # end_status=0
     if len(res) <= 0:
-        result = '{' + param.conformMsg.format(1) + '}'
+        result = '{' + param.conformMsg.format( " have no task " ) + '}'
         return HttpResponse(result)
     for row in res:
         if row.task_type == 1 and row.task_status == 4:
             models.task_info.objects.filter(pid=pid, current_task=True, ).update(
                 task_type=2, task_status=0)  # end_status=0
-            result = '{' + param.conformMsg.format( 0) + '}'
+            result = makeTaskList(pid, 2, 0)
             return HttpResponse(result)
         else:
-            result = '{' + param.conformMsg.format( 1) + '}'
+            result = '{' + param.conformMsg.format( " taskStatus != 4 " ) + '}'
             return HttpResponse(result)
     #except :
     #    result = '{' + param.conformMsg.format(1 ) + '}'
@@ -478,7 +470,17 @@ def paid(request):
         pid = request.GET.get('pid',default='0')
         price = request.GET.get('price',default='0.0')
 
+        res = models.task_info.objects.filter(pid=pid) 
+
         models.app_task.objects.filter(pid = pid).update(have_task = 0)
+        
+        models.end_task_info.objects.create(pid=res[0].pid, tid=res[0].tid, 
+            start_lon=res[0].start_lon, start_lat=res[0].start_lat, end_lon=res[0].end_lon, end_lat=res[0].end_lat, 
+            transfer_points=res[0].transfer_points, path=res[0].path, car_num=res[0].car_num, end_status=1,
+            price = res[0].price)
+        models.task_info.objects.filter(tid = res[0].tid).delete()
+        result = '{' + param.conformMsg.format( 0 ) + '}'
+        return HttpResponse(result)
 
     else :
 

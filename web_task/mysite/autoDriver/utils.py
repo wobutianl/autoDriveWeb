@@ -4,7 +4,7 @@ from datetime import datetime
 
 def inWhichArea( lat, lon ):
     p = Point(lon, lat)
-    print (p)
+    # print (p)
     if p.within(driveArea.areaA):
         print(1)
         return 1

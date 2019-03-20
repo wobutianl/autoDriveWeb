@@ -51,4 +51,5 @@ urlpatterns = [
     path('/api/vehicle/begin/', view_api_vehicle.begin, name = "vehicleBegin"),
     path('/api/vehicle/run/', view_api_vehicle.run, name = "vehicleRun"),
     path('/api/vehicle/arrival/', view_api_vehicle.arrival, name = "vehicleArrival"),
+    path('/api/vehicle/cancel/', view_api_vehicle.cancel, name = "vehicleCancel"),
 ]
