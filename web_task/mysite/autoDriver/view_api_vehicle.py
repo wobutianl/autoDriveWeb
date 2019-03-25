@@ -54,14 +54,14 @@ def update(request):
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status , 'lon': res[0].start_lon, 'lat': res[0].start_lat}
                 return HttpResponse( json.dumps(result) )
 
-            res = models.task_info.objects.filter(car_num=carNum, task_type=1, task_status=1) # end_status=0, 
+            res = models.task_info.objects.filter(car_num=carNum, task_type=1 ) # end_status=0, , task_status = 0
             if len(res) > 0:
                 
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status}
                 # print('get task', result)
                 return HttpResponse( json.dumps(result) )
 
-            res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status=0) # end_status=0, 
+            res = models.task_info.objects.filter(car_num=carNum, task_type=2 ) # end_status=0, , task_status = 0
             if len(res) > 0:
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status, 'lon': res[0].end_lon, 'lat': res[0].end_lat}
                 return HttpResponse( json.dumps(result) )

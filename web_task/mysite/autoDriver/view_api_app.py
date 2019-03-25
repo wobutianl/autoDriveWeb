@@ -71,36 +71,31 @@ def makeTaskList( pid, taskType, taskStatus ):
     taskList = []
     if len(res) == 1:
         print( str(taskStatus)  +  "    " + str(res[0].task_status) )
-        if int(taskStatus) == 1 and int(res[0].task_status) == 2 :
-            print('have one task ' + res[0].car_num  + " get path ")
-            veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
-            taskjson = param.taskListJson
-            taskjson[param.current_task_name] = res[0].current_task
+        veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
+        taskjson = param.taskListJson
+        taskjson[param.current_task_name] = res[0].current_task
+        # taskjson[param.vid_name] = res[0].car_num
+        taskjson[param.task_type_name] = res[0].task_type
+        taskjson[param.task_status_name] = res[0].task_status
+        taskjson[param.lon_name] = veh_res[0].lon
+        taskjson[param.lat_name] = veh_res[0].lat
+        taskjson[param.estimate_name] = veh_res[0].estimate_time
+        taskjson[param.odometry_name] = veh_res[0].odometry
+        # taskjson[param.path_name] = res[0].path
+            
+        if int(taskStatus) == 1 and int(res[0].task_status) == 1 :
             taskjson[param.vid_name] = res[0].car_num
-            taskjson[param.task_type_name] = res[0].task_type
-            taskjson[param.task_status_name] = res[0].task_status
-            taskjson[param.lon_name] = veh_res[0].lon
-            taskjson[param.lat_name] = veh_res[0].lat
-            taskjson[param.estimate_name] = veh_res[0].estimate_time
-            taskjson[param.odometry_name] = veh_res[0].odometry
             taskjson[param.path_name] = res[0].path
-
-            taskList.append(taskjson)
-        else:
-            print('have one task ' + res[0].car_num )
-            veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
-            taskjson = param.taskListJson
-            taskjson[param.current_task_name] = res[0].current_task
+        elif int(taskStatus) == 1 and int(res[0].task_status) == 0:
+            taskjson[param.vid_name] = "" # res[0].car_num
+            taskjson[param.path_name] = []
+        elif int(taskStatus) == 1 and int(res[0].task_status) == 2 :
             taskjson[param.vid_name] = res[0].car_num
-            taskjson[param.task_type_name] = res[0].task_type
-            taskjson[param.task_status_name] = res[0].task_status
-            taskjson[param.lon_name] = veh_res[0].lon
-            taskjson[param.lat_name] = veh_res[0].lat
-            taskjson[param.estimate_name] = veh_res[0].estimate_time
-            taskjson[param.odometry_name] = veh_res[0].odometry
             taskjson[param.path_name] = res[0].path
-
-            taskList.append(taskjson)
+        else :
+            taskjson[param.vid_name] = res[0].car_num
+            taskjson[param.path_name] =  res[0].path
+        taskList.append(taskjson)
             
         pass
     elif len(res) == 2:
@@ -109,36 +104,20 @@ def makeTaskList( pid, taskType, taskStatus ):
         # if 1, 0 : all the car get prepared then 1,1, path else return 0, 0
         if int(taskType) in ( 1, 2)  and int(taskStatus) == 0:
             res = models.task_info.objects.filter(pid=pid, task_status = 0) # end_status=0, 
-            if len(res) > 0:
-                for t in res:
-                    veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
-                    taskjson = param.taskListJson
-                    taskjson[param.current_task_name] = t.current_task
-                    taskjson[param.vid_name] = t.car_num
-                    taskjson[param.task_type_name] = 1
-                    taskjson[param.task_status_name] = 0 
-                    taskjson[param.lon_name] = veh_res[0].lon
-                    taskjson[param.lat_name] = veh_res[0].lat
-                    taskjson[param.estimate_name] = veh_res[0].estimate_time
-                    taskjson[param.odometry_name] = veh_res[0].odometry
-                    taskjson[param.path_name] = [] # t.path
-                    
-                    taskList.append(taskjson)
-            else:
-                for t in res:
-                    veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
-                    taskjson = param.taskListJson
-                    taskjson[param.current_task_name] = t.current_task
-                    taskjson[param.vid_name] = t.car_num
-                    taskjson[param.task_type_name] = t.task_type
-                    taskjson[param.task_status_name] = t.task_status 
-                    taskjson[param.lon_name] = veh_res[0].lon
-                    taskjson[param.lat_name] = veh_res[0].lat
-                    taskjson[param.estimate_name] = veh_res[0].estimate_time
-                    taskjson[param.odometry_name] = veh_res[0].odometry
-                    taskjson[param.path_name] = [] #t.path
+            for t in res:
+                veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
+                taskjson = param.taskListJson
+                taskjson[param.current_task_name] = t.current_task
+                taskjson[param.vid_name] = "" # t.car_num
+                taskjson[param.task_type_name] = t.task_type
+                taskjson[param.task_status_name] = t.task_status 
+                taskjson[param.lon_name] = veh_res[0].lon
+                taskjson[param.lat_name] = veh_res[0].lat
+                taskjson[param.estimate_name] = veh_res[0].estimate_time
+                taskjson[param.odometry_name] = veh_res[0].odometry
+                taskjson[param.path_name] = [] #t.path
 
-                    taskList.append(taskjson)
+                taskList.append(taskjson)
             pass
         elif int(taskStatus) == 1 and int(cur_res[0].taskStatus) == 2 :
             for t in res:
@@ -155,25 +134,6 @@ def makeTaskList( pid, taskType, taskStatus ):
                 taskjson[param.path_name] = t.path
 
                 taskList.append(taskjson)
-        elif int(taskType) == 2 and int(taskStatus) == 4:
-            # change current_task
-            # models.task_info.objects.filter(pid=pid, end_status=0, current_task = 1).update(end_status = 1)
-            models.task_info.objects.filter(pid=pid, current_task = 0).update(current_task = 1) # end_status=0, 
-            res = models.task_info.objects.filter(pid=pid, current_task = 1) # end_status=0, 
-
-            veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
-            taskjson = param.taskListJson
-            taskjson[param.current_task_name] = res[0].current_task
-            taskjson[param.vid_name] = res[0].car_num
-            taskjson[param.task_type_name] = res[0].task_type
-            taskjson[param.task_status_name] = res[0].task_status 
-            taskjson[param.lon_name] = veh_res[0].lon
-            taskjson[param.lat_name] = veh_res[0].lat
-            taskjson[param.estimate_name] = veh_res[0].estimate_time
-            taskjson[param.odometry_name] = veh_res[0].odometry
-            taskjson[param.path_name] = t.path
-
-            taskList.append(taskjson)
         else:
             for t in res:
                 veh_res = models.vehicle_info.objects.filter(car_num=t.car_num)
@@ -199,11 +159,11 @@ def reserve(request):
         pid = request.GET.get('pid',default='0')
         startLon = request.GET.get('startLon', default='0.0')
         startLat = request.GET.get('startLat', default='0.0')
-        startLon, startLat = utils.gcj2wgs( float(startLon), float(startLat))
+        # startLon, startLat = utils.gcj2wgs( float(startLon), float(startLat))
 
         endLon = request.GET.get('endLon', default='0.0')
         endLat = request.GET.get('endLat', default='0.0')
-        endlon, endlat = utils.gcj2wgs( float(endLon), float(endLat) )
+        # endlon, endlat = utils.gcj2wgs( float(endLon), float(endLat) )
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
@@ -214,9 +174,9 @@ def reserve(request):
         return HttpResponse(result)
 
     startArea = utils.inWhichArea( float(startLat), float(startLon) )
-    endArea = utils.inWhichArea( float(startLat), float(startLon) )
+    endArea = utils.inWhichArea( float(endLat), float(endLon) )
     if startArea == 0 or endArea == 0 :
-        result = '{' + param.conformMsg.format(' not in the area ') + '}'
+        result = '{' + param.conformMsg.format( startLat + startLon  ) + '}'
         return HttpResponse(result)
     elif startArea == endArea :
         # insert into task_info
