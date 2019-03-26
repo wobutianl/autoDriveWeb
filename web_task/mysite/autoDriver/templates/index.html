@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>默认点标记</title>
+    
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+        }
+
+        .amap-icon img,
+        .amap-marker-content img{
+            width: 25px;
+            height: 34px;
+        }
+
+        .marker {
+            position: absolute;
+            top: -20px;
+            right: -118px;
+            color: #fff;
+            padding: 4px 10px;
+            box-shadow: 1px 1px 1px rgba(10, 10, 10, .2);
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: "";
+            background-color: #25A5F7;
+            border-radius: 3px;
+        }
+
+        .input-card{
+            width: 32rem;
+            z-index: 170;
+        }
+
+        .input-card .btn{
+            margin-right: .8rem;
+        }
+
+        .input-card .btn:last-child{
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script src="https://webapi.amap.com/maps?v=1.4.13&key=Q2TGXNVYW8AUFW2PRD5MPHYTCJ&plugin=AMap.PolyEditor"></script>
+<script type="text/javascript" src="../../static/positionUtil.js"></script> 
+<script language="javascript" src="../../static/AjaxRequest.js"></script>
+<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<!-- <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script> -->
+
+<!-- <script language="javascript">
+    /******************错误处理的方法*******************************/
+    function onerror(){
+        alert("您的操作有误！");
+    }
+    /******************实例化Ajax对象的方法*******************************/
+    function getInfo(){
+        var loader=new net.AjaxRequest("",deal_getInfo,onerror,"GET");
+    }
+    /************************回调函数**************************************/
+    function deal_getInfo(){
+        // document.getElementById("showInfo").innerHTML=this.req.responseText;
+    }
+    window.onload=function(){
+        getInfo();	//调用getInfo()方法获取公告信息
+        window.setInterval("getInfo()", 1000);	//每隔10分钟调用一次getInfo()方法
+    }
+</script> -->
+
+<script type="text/javascript">
+    var  map = new AMap.Map("container", {
+        resizeEnable: true,
+        center: [121.604114873686, 31.1871685831183],
+        zoom: 13
+    });
+
+    var marker
+
+    // 实例化点标记
+    function addMarker(lon, lat, pic) {
+        var icon_url = ''
+        if (pic == "normal"){
+            icon_url = "../../static/icons/venus_didi.png"
+        }else if(pic == 'start'){
+            icon_url = "../../static/icons/icon_loaction_start.png"
+        }else if(pic == 'end'){
+            icon_url = "../../static/icons/icon_loaction_stop.png"
+        }
+        marker = new AMap.Marker({
+            map: map,
+            icon: icon_url,
+            position: [lon, lat],
+            offset: new AMap.Pixel(-13, -30)
+        });
+        marker.setMap(map);
+    }
+
+    function updateMarker() {
+
+        if (!marker) {
+            return;
+        }
+
+        // 自定义点标记内容
+        var markerContent = document.createElement("div");
+
+        // 点标记中的图标
+        var markerImg = document.createElement("img");
+        markerImg.className = "markerlnglat";
+        markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
+        markerContent.appendChild(markerImg);
+
+        // 点标记中的文本
+        var markerSpan = document.createElement("span");
+        markerSpan.className = 'marker';
+        markerSpan.innerHTML = "Hi，我被更新啦！";
+        markerContent.appendChild(markerSpan);
+
+        marker.setContent(markerContent); //更新点标记内容
+        marker.setPosition([116.391467, 39.927761]); //更新点标记位置
+    }
+
+    // 清除 marker
+    function clearMarker() {
+        map.clearMap();
+    }
+
+    function drawPolyline(path){
+        var polyline = new AMap.Polyline({
+            path: path,
+            isOutline: true,
+            outlineColor: '#ffeeff',
+            borderWeight: 3,
+            strokeColor: "#3366FF", 
+            strokeOpacity: 1,
+            strokeWeight: 6,
+            // 折线样式还支持 'dashed'
+            strokeStyle: "solid",
+            // strokeStyle是dashed时有效
+            strokeDasharray: [10, 5],
+            lineJoin: 'round',
+            lineCap: 'round',
+            zIndex: 50,
+        })
+
+        polyline.setMap(map)
+        // 缩放地图到合适的视野级别
+        map.setFitView([ polyline ])
+
+        var polyEditor = new AMap.PolyEditor(map, polyline) 
+    }
+
+    AMapUI.loadUI( ['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+    });
+
+    
+    function parserPath(str_path){
+        var path = []
+        var obj = eval( str_path )
+        console.log(obj)
+        for(var i=0; i<obj.length; i++){
+            var point = wgs84togcj02( obj[i].lon, obj[i].lat )
+            path[i]=[ point[0], point[1] ]
+        }
+        console.log(path)
+        return path 
+    }
+
+
+    function runEvery10Sec() { 
+        // 1000 * 10 = 10 秒钟
+        setTimeout( runEvery10Sec, 1000 * 5 ); 
+        console.log("car text " + car_text)
+        ajax_get_info(car_text)
+    }
+    runEvery10Sec()
+    // window.onload = function () {
+    //         console.log("update ")
+    //         setTimeout('runEvery10Sec()', 1000*1); //指定10秒刷新一次 
+    //     }
+
+    var car_text 
+    function getContent(value,text){
+
+        var value = value 
+        car_text = text
+        console.log("选中的值是"+value+"选中的内容是"+text);
+        ajax_get_info(car_text)
+        
+    }
+
+    function ajax_get_info( text ){
+        $.ajax({
+        url : "autodrive/ajax_dict/"+text,
+        type : "get",
+        dataType : "json",
+    
+        success : function(e) {
+
+            clearMarker()
+
+            AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+
+                if (e.task == [] && e.vehicle == []){
+                    return 
+                }
+                var task = JSON.parse(e.task) 
+                var vehicle = JSON.parse(e.vehicle)
+                var status = "当前没有任务"
+
+                console.log(task)
+                console.log(vehicle[0])
+                if (task.length > 0 ){
+                    if(task[0].fields.task_status == '1'|| task[0].fields.task_status == '2'|| task[0].fields.task_status == '3'){
+                        status = "在运行中"
+                    }else if ( task[0].fields.task_status =='4' ){
+                        status = '运行结束'
+                    }
+                    // 路径
+                    
+                    drawPolyline(parserPath( task[0].fields.path))
+
+                    var point1 = wgs84togcj02( task[0].fields.start_lon,task[0].fields.start_lat )
+                    addMarker(point1[0], point1[1], "start")
+
+                    var point2 = wgs84togcj02( task[0].fields.end_lon,task[0].fields.end_lat )
+                    addMarker(point2[0], point2[1], "end")
+                }
+                if( vehicle.length > 0 ){
+                    var point = wgs84togcj02( vehicle[0].fields.lon,vehicle[0].fields.lat )
+                    addMarker(point[0], point[1], "normal")
+                }
+                
+
+                var infoWindow = new SimpleInfoWindow({
+                    //模板, underscore
+                    infoTitle: '<strong><%- title %></strong>',
+                    infoBody: '<p class="my-desc">' +
+                        //<%- html编码后插入
+                        '<%- body %>' +
+                        '</p>',
+                    //模板数据
+                    infoTplData: {
+                        title: '"车牌-"' + vehicle[0].pk,
+                        body: status
+                    },
+
+                    //基点指向marker的头部位置
+                    offset: new AMap.Pixel(0, -31)
+                });
+
+                function openInfoWin() {
+                    infoWindow.open(map, marker.getPosition());
+                }
+                //marker 点击时打开
+                AMap.event.addListener(marker, 'click', function() {
+                    openInfoWin();
+                });
+                openInfoWin();
+            });
+        }
+        }) //	Ajax结束
+    }
+
+</script>
+
+
+<div class="input-card">
+    
+    <label style="color:grey">车辆选择</label>
+    <div class="input-item">
+        <select name="选择车辆" onchange="getContent(this.value,this.options[this.selectedIndex].text)"> 
+            {% for a in vehicle_info %}
+            {% if a.car_num != '0' %}
+            <option value={{ forloop.counter }} > {{ a.car_num}}</option> 
+            {% endif %}
+            {% endfor %}
+        </select> 
+    </div>
+</div>
+
+
+</body>
+</html>
+    
+    
+  </body>
+</html>
+
+

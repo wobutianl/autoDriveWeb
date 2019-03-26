@@ -52,4 +52,8 @@ urlpatterns = [
     path('/api/vehicle/run/', view_api_vehicle.run, name = "vehicleRun"),
     path('/api/vehicle/arrival/', view_api_vehicle.arrival, name = "vehicleArrival"),
     path('/api/vehicle/cancel/', view_api_vehicle.cancel, name = "vehicleCancel"),
+
+
+    ################################   ajax   ###########################
+    path('/ajax_dict/<str:car_num>/', views.ajax_dict, name='ajax-dict'),
 ]
