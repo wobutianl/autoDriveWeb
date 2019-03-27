@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from . import models
 import json
-
+from django.core import serializers
+from django.http import JsonResponse
 from django.http import HttpResponse
 from . import utils
 from . import driveArea
@@ -402,28 +403,47 @@ def taskQuery(request):
 def parkInfo(request):
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
+        # is admin account
+        res = models.app_info.objects.filter(pid=pid, p_type = 2) 
+        if(len(res)>0):
+            res = models.vehicle_info.objects.filter(have_task = 0).values('car_num') 
+            json_task_data = serializers.serialize("json", res)
+            return JsonResponse(json_task_data)
     else :
-        result = '{' + param.conformMsg.format( ' request error ') + '}'
+        result = '{' + param.conformMsg.format( ' 1 ') + '}'
         return HttpResponse(result)
 
     # 可泊车辆信息 
     pass
 
 def unstartInfo(request):
+    # 可启动车辆信息
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
     else :
-        result = '{' + param.conformMsg.format( ' request error ') + '}'
+        result = '{' + param.conformMsg.format( ' 1 ') + '}'
         return HttpResponse(result)
 
     pass
 
 def vehicleInfo(request):
+    # 某个车辆信息
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
         carNum = request.GET.get('carNum',default='0')
+
+        res = models.app_info.objects.filter(pid=pid, p_type = 2) 
+        if(len(res)>0):
+            vehicle_list = models.vehicle_info.objects.filter(car_num = carNum ) # .values('car_num','lon','lat')
+            json_vehicle_data = serializers.serialize("json", vehicle_list)
+            
+            task_list = models.task_info.objects.filter(car_num = carNum)
+            json_task_data = serializers.serialize("json", task_list)
+
+            return JsonResponse({"vehicle": json_vehicle_data, "task": json_task_data}, safe=False )
+
     else :
-        result = '{' + param.conformMsg.format( ' request error ') + '}'
+        result = '{' + param.conformMsg.format( ' 1 ') + '}'
         return HttpResponse(result)
 
     pass
@@ -442,7 +462,7 @@ def paid(request):
             transfer_points=res[0].transfer_points, path=res[0].path, car_num=res[0].car_num, end_status=1,
             price = res[0].price)
         models.task_info.objects.filter(tid = res[0].tid).delete()
-        result = '{' + param.conformMsg.format( 0 ) + '}'
+        result = '{' + param.conformMsg.format( 99 ) + '}'
         return HttpResponse(result)
 
     else :

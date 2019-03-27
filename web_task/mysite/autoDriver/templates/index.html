@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>默认点标记</title>
+    <title>车辆运行信息显示</title>
     
     <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
     <style>
@@ -55,26 +55,6 @@
 <script type="text/javascript" src="../../static/positionUtil.js"></script> 
 <script language="javascript" src="../../static/AjaxRequest.js"></script>
 <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
-<!-- <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script> -->
-
-<!-- <script language="javascript">
-    /******************错误处理的方法*******************************/
-    function onerror(){
-        alert("您的操作有误！");
-    }
-    /******************实例化Ajax对象的方法*******************************/
-    function getInfo(){
-        var loader=new net.AjaxRequest("",deal_getInfo,onerror,"GET");
-    }
-    /************************回调函数**************************************/
-    function deal_getInfo(){
-        // document.getElementById("showInfo").innerHTML=this.req.responseText;
-    }
-    window.onload=function(){
-        getInfo();	//调用getInfo()方法获取公告信息
-        window.setInterval("getInfo()", 1000);	//每隔10分钟调用一次getInfo()方法
-    }
-</script> -->
 
 <script type="text/javascript">
     var  map = new AMap.Map("container", {
@@ -102,31 +82,6 @@
             offset: new AMap.Pixel(-13, -30)
         });
         marker.setMap(map);
-    }
-
-    function updateMarker() {
-
-        if (!marker) {
-            return;
-        }
-
-        // 自定义点标记内容
-        var markerContent = document.createElement("div");
-
-        // 点标记中的图标
-        var markerImg = document.createElement("img");
-        markerImg.className = "markerlnglat";
-        markerImg.src = "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png";
-        markerContent.appendChild(markerImg);
-
-        // 点标记中的文本
-        var markerSpan = document.createElement("span");
-        markerSpan.className = 'marker';
-        markerSpan.innerHTML = "Hi，我被更新啦！";
-        markerContent.appendChild(markerSpan);
-
-        marker.setContent(markerContent); //更新点标记内容
-        marker.setPosition([116.391467, 39.927761]); //更新点标记位置
     }
 
     // 清除 marker
@@ -183,10 +138,6 @@
         ajax_get_info(car_text)
     }
     runEvery10Sec()
-    // window.onload = function () {
-    //         console.log("update ")
-    //         setTimeout('runEvery10Sec()', 1000*1); //指定10秒刷新一次 
-    //     }
 
     var car_text 
     function getContent(value,text){
@@ -273,7 +224,6 @@
 
 </script>
 
-
 <div class="input-card">
     
     <label style="color:grey">车辆选择</label>
@@ -288,12 +238,5 @@
     </div>
 </div>
 
-
 </body>
 </html>
-    
-    
-  </body>
-</html>
-
-
