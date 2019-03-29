@@ -4,6 +4,7 @@ import json
 from django.core import serializers
 from django.http import JsonResponse
 from django.http import HttpResponse
+from django.forms.models import model_to_dict
 from . import utils
 from . import driveArea
 from . import param
@@ -264,15 +265,17 @@ def park(request ):
         return HttpResponse(result)
 
     # try:
-    res = models.task_info.objects.filter( pid = pid, ) #end_status=0 
-    if len(res) <= 0:
-        result = '{' + param.conformMsg.format(1) + '}'
+    res = models.task_info.objects.filter( car_num = carNum, ) #end_status=0 
+    if len(res) <= 0 :
+        result = '{' + param.conformMsg.format("cat have no task") + '}'
         return HttpResponse(result)
-    for row in res:
-        models.task_info.objects.filter(pid=pid, ).update(
-            task_type=3, task_status=0)  # end_status=0
-        result = '{' + param.conformMsg.format( 0) + '}'
+    elif  len(res) > 1:
+        result = '{' + param.conformMsg.format( "car have more than one task ") + '}'
         return HttpResponse(result)
+    models.task_info.objects.filter( car_num = carNum, ).update(
+        task_type=3, task_status=0)  # end_status=0
+    result = '{' + param.conformMsg.format( 0) + '}'
+    return HttpResponse(result)
     #except :
     #    result = '{' + param.conformMsg.format(1 ) + '}'
     #    return HttpResponse( result)
@@ -404,20 +407,23 @@ def parkInfo(request):
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
         # is admin account
-        res = models.app_info.objects.filter(pid=pid, p_type = 2) 
+        res = models.app_info.objects.filter(pid=pid, p_type = 2 ) 
         if(len(res)>0):
+            # print("this is park info ")
             res = models.vehicle_info.objects.filter(have_task = 0).values('car_num') 
-            json_task_data = serializers.serialize("json", res)
-            return JsonResponse(json_task_data)
-    else :
-        result = '{' + param.conformMsg.format( ' 1 ') + '}'
-        return HttpResponse(result)
+            # json_task_data = serializers.serialize("json", res[0])
+            #json_list = []
+            #for good in res:
+            #    json_dict  = {}
+            #    json_dict ["car_num"] = good['car_num']
+            #    json_list.append(json_dict)
+            return HttpResponse( res )
+    result = '{' + param.conformMsg.format( ' 1 ') + '}'
+    return HttpResponse(result)
 
-    # 可泊车辆信息 
     pass
 
 def unstartInfo(request):
-    # 可启动车辆信息
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
     else :
@@ -427,7 +433,6 @@ def unstartInfo(request):
     pass
 
 def vehicleInfo(request):
-    # 某个车辆信息
     if request.method == 'GET':
         pid = request.GET.get('pid',default='0')
         carNum = request.GET.get('carNum',default='0')
