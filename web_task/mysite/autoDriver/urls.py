@@ -56,4 +56,5 @@ urlpatterns = [
 
     ################################   ajax   ###########################
     path('/ajax_dict/<str:car_num>/', views.ajax_dict, name='ajax-dict'),
+    path('/nullmax_vehicle_info/', views.nullmax_vehicle_info, name='nullmax_vehicle_info'),
 ]
