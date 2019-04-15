@@ -30,6 +30,7 @@ def update(request):
         battery = request.GET.get('battery',default=0)
         estimateTime = request.GET.get('estimateTime', default=0)
         odometry = request.GET.get('odometry', default=1)
+        velocity = request.GET.get('velocity', default = '0.0')
 
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
@@ -41,7 +42,7 @@ def update(request):
     # print("the lens of vehicle ", len(v_res), carNum, vehicleType)
     if len(v_res) == 0: # register in db
         models.vehicle_info.objects.create(car_num=carNum, vehicle_type = vehicleType,lon=lon, lat=lat,available = available, battery=battery,
-                    estimate_time=estimateTime, odometry=odometry , have_task = 0, end_time = '0' )
+                    estimate_time=estimateTime, odometry=odometry , velocity = velocity, have_task = 0, end_time = '0' )
     else:   # have msg in task table or not
         t_res = models.task_info.objects.filter( car_num = carNum )
         if len(t_res)>0:
@@ -51,10 +52,11 @@ def update(request):
             #print("taskStatus:", taskStatus)
             # print("the car have task ")
             models.vehicle_info.objects.filter( car_num=carNum ).update(
-                        lon=lon, lat=lat,available = available, battery=battery,
+                        lon=lon, lat=lat,available = available, battery=battery, velocity = velocity,
                     estimate_time=estimateTime, odometry=odometry , have_task = 1)
                 # res = models.task_info.objects.filter( car_num = carNum )
             # when task belong to 1 0 , the first time to get task 
+
             res = models.task_info.objects.filter( car_num = carNum, task_type=1, task_status=0 ) # end_status=0, 
             if len(res)>0:
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status , 'lon': res[0].start_lon, 'lat': res[0].start_lat }
@@ -71,7 +73,7 @@ def update(request):
             res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status = 0 ) # end_status=0, 
             if len(res) > 0:
                 result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status, 'lon': res[0].end_lon, 'lat': res[0].end_lat}
-                print("end_lon", res[0].end_lon)
+                # print("end_lon", res[0].end_lon)
                 return HttpResponse( json.dumps(result) )
 
             res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status=1) # end_status=0, 
@@ -100,7 +102,7 @@ def update(request):
             
         else : # have no task 
              models.vehicle_info.objects.filter( car_num=carNum ).update(
-                        lon=lon, lat=lat,available = available, battery=battery,
+                        lon=lon, lat=lat,available = available, battery=battery, velocity = velocity,
                     estimate_time=estimateTime, odometry=odometry , have_task = 0)
  
          # vehicle arrivaled beyonged 2mintes
@@ -114,7 +116,7 @@ def update(request):
             # print( (cur_time - utils.str2datetime(v_res[0].end_time) ).seconds )
             if  (cur_time - utils.str2datetime(v_res[0].end_time) ).seconds > 120:
                 models.vehicle_info.objects.filter(car_num=carNum).update(
-                    lon=lon, lat=lat, available=available, battery=battery, 
+                    lon=lon, lat=lat, available=available, battery=battery, velocity = velocity,
                     estimate_time=0.0, odometry=0.0 ,have_task = 0, end_time='0' )
                
     #print("resp update taskType:", taskType)

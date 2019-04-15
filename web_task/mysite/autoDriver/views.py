@@ -76,6 +76,7 @@ def nullmax_vehicle_info(request ):
     lon = "0.0"
     lat = "0.0"
     vel = "0.0"
+
     bat = "0.0"
 
     task_list = models.task_info.objects.filter(car_num = "nullmax007")
@@ -100,5 +101,4 @@ def nullmax_vehicle_info(request ):
         vel=0.0 # vehicle_list[0].lat
         
     result = result.format(bat, lon, lat, vel, path , status )
-
     return JsonResponse( '{' + result +'}' , safe=False )

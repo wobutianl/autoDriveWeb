@@ -30,6 +30,7 @@ class vehicle_info(models.Model):
     odometry = models.FloatField(default=0.0)
     end_time = models.TextField(default='0')
     have_task = models.IntegerField(default=0)
+    velocity = models.FloatField(default=0.0)
 
     pass
 
