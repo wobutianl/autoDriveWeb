@@ -97,7 +97,7 @@ def nullmax_vehicle_info(request ):
         bat=vehicle_list[0].battery
         lon=vehicle_list[0].lon
         lat=vehicle_list[0].lat
-        vel=0.0 # vehicle_list[0].lat
+        vel=8.5 # vehicle_list[0].lat
         
     result = result.format(bat, lon, lat, vel, path , status )
 
