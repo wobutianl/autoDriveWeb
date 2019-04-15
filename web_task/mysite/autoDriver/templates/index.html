@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>车辆运行信息显示</title>
+    <title>Car Num Info Show</title>
     
     <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
     <style>
@@ -65,7 +65,6 @@
 
     var marker
 
-    // 实例化点标记
     function addMarker(lon, lat, pic) {
         var icon_url = ''
         if (pic == "normal"){
@@ -84,7 +83,6 @@
         marker.setMap(map);
     }
 
-    // 清除 marker
     function clearMarker() {
         map.clearMap();
     }
@@ -98,9 +96,7 @@
             strokeColor: "#3366FF", 
             strokeOpacity: 1,
             strokeWeight: 6,
-            // 折线样式还支持 'dashed'
             strokeStyle: "solid",
-            // strokeStyle是dashed时有效
             strokeDasharray: [10, 5],
             lineJoin: 'round',
             lineCap: 'round',
@@ -108,7 +104,6 @@
         })
 
         polyline.setMap(map)
-        // 缩放地图到合适的视野级别
         map.setFitView([ polyline ])
 
         var polyEditor = new AMap.PolyEditor(map, polyline) 
@@ -132,7 +127,6 @@
 
 
     function runEvery10Sec() { 
-        // 1000 * 10 = 10 秒钟
         setTimeout( runEvery10Sec, 1000 * 5 ); 
         console.log("car text " + car_text)
         ajax_get_info(car_text)
@@ -144,7 +138,7 @@
 
         var value = value 
         car_text = text
-        console.log("选中的值是"+value+"选中的内容是"+text);
+        console.log("choose value"+value+"value"+text);
         ajax_get_info(car_text)
         
     }
@@ -166,17 +160,16 @@
                 }
                 var task = JSON.parse(e.task) 
                 var vehicle = JSON.parse(e.vehicle)
-                var status = "当前没有任务"
+                var status = "no task"
 
                 console.log(task)
                 console.log(vehicle[0])
                 if (task.length > 0 ){
                     if(task[0].fields.task_status == '1'|| task[0].fields.task_status == '2'|| task[0].fields.task_status == '3'){
-                        status = "在运行中"
+                        status = "running"
                     }else if ( task[0].fields.task_status =='4' ){
-                        status = '运行结束'
+                        status = 'complete'
                     }
-                    // 路径
                     
                     drawPolyline(parserPath( task[0].fields.path))
 
@@ -193,47 +186,45 @@
                 
 
                 var infoWindow = new SimpleInfoWindow({
-                    //模板, underscore
                     infoTitle: '<strong><%- title %></strong>',
                     infoBody: '<p class="my-desc">' +
-                        //<%- html编码后插入
                         '<%- body %>' +
                         '</p>',
-                    //模板数据
                     infoTplData: {
-                        title: '"车牌-"' + vehicle[0].pk,
+                        title: '"carnum-"' + vehicle[0].pk,
                         body: status
                     },
 
-                    //基点指向marker的头部位置
                     offset: new AMap.Pixel(0, -31)
                 });
 
                 function openInfoWin() {
                     infoWindow.open(map, marker.getPosition());
                 }
-                //marker 点击时打开
+                //marker 
                 AMap.event.addListener(marker, 'click', function() {
                     openInfoWin();
                 });
                 openInfoWin();
             });
         }
-        }) //	Ajax结束
+        }) 
     }
 
 </script>
 
 <div class="input-card">
     
-    <label style="color:grey">车辆选择</label>
+    <label style="color:grey">car</label>
     <div class="input-item">
-        <select name="选择车辆" onchange="getContent(this.value,this.options[this.selectedIndex].text)"> 
+        <select name="car" onchange="getContent(this.value,this.options[this.selectedIndex].text)"> 
             {% for a in vehicle_info %}
             {% if a.car_num != '0' %}
             <option value={{ forloop.counter }} > {{ a.car_num}}</option> 
             {% endif %}
             {% endfor %}
+            <option value=1 > nullmax007 </option> 
+            <option value=2 > Gem001 </option> 
         </select> 
     </div>
 </div>

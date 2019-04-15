@@ -47,7 +47,7 @@ def makeTaskList( pid, taskType , taskStatus ):
     # make a task list from task_info table
     res = models.task_info.objects.filter(pid=pid, ) # end_status=0
     result = param.webToApp
-    transferPoints = res[0].transfer_points
+    transferPoints = 0 #res[0].transfer_points
     taskList = []
     if len(res) == 1:
         print('have one task ' + res[0].car_num )
