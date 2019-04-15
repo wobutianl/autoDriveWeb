@@ -26,11 +26,9 @@ def update(request):
         lon = request.GET.get('lon', default=0)
         lat = request.GET.get('lat', default=0)
 
-        haveTask = request.GET.get('haveTask', default=0)
-        battery = request.GET.get('battery',default=0)
-        estimateTime = request.GET.get('estimateTime', default=0)
-        odometry = request.GET.get('odometry', default=1)
-        velocity = request.GET.get('velocity', default = '0.0')
+
+
+
 
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'

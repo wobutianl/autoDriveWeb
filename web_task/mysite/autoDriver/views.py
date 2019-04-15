@@ -101,4 +101,6 @@ def nullmax_vehicle_info(request ):
         vel=0.0 # vehicle_list[0].lat
         
     result = result.format(bat, lon, lat, vel, path , status )
+
+
     return JsonResponse( '{' + result +'}' , safe=False )
