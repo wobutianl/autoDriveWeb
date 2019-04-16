@@ -45,6 +45,9 @@ class app_task(models.Model):
     lon = models.FloatField(default=0.0)
     lat = models.FloatField(default=0.0)
     have_task = models.IntegerField(default=0)
+
+    task_type = models.IntegerField(default=0)
+    task_status = models.IntegerField(default=0)
     
 
     def __str__(self):

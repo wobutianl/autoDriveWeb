@@ -164,8 +164,10 @@ def getTask(request):
             #print("get task taskStatus:", taskStatus)
             models.task_info.objects.filter(car_num = carNum).update( task_status=1 )
             models.vehicle_info.objects.filter(car_num = carNum).update( have_task = 1 )
-            result = '{' + param.conformMsg.format( 10 ) + '}'
-            return HttpResponse(result)
+            res = models.app_task.objects.filter(pid = res[0].pid, task_status=1)
+            if len(res) > 0:
+                result = '{' + param.conformMsg.format( 10 ) + '}'
+                return HttpResponse(result)
         
 
     result = '{' + param.conformMsg.format(1) + '}'
@@ -196,8 +198,11 @@ def begin(request):
         res = models.task_info.objects.filter(car_num = carNum, task_type__in=[1,2,3], task_status=1)
         if len(res) > 0 :
             models.task_info.objects.filter(car_num=carNum).update( task_status=2, path = path  ) 
-            result = '{' + param.conformMsg.format(11) + '}'
-            return HttpResponse(result)
+
+            res = models.app_task.objects.filter(pid = res[0].pid, task_status=2)
+            if len(res) > 0:
+                result = '{' + param.conformMsg.format(11) + '}'
+                return HttpResponse(result)
 
     result = '{' + param.conformMsg.format(1) + '}'
     return HttpResponse(result)
@@ -240,9 +245,11 @@ def run(request):
         res = models.task_info.objects.filter(car_num = carNum, task_type__in=[1,2,3] )
         if len(res) > 0 :
           # update task table
-          models.task_info.objects.filter(car_num=carNum).update( task_status=3 )
-          result = '{' + param.conformMsg.format(12) + '}'
-          return HttpResponse(result)
+            models.task_info.objects.filter(car_num=carNum).update( task_status=3 )
+            res = models.app_task.objects.filter(pid = res[0].pid, task_status=3)
+            if len(res) > 0:
+                result = '{' + param.conformMsg.format(12) + '}'
+                return HttpResponse(result)
 
     result = '{' + param.conformMsg.format(1) + '}'
     return HttpResponse(result)
@@ -266,8 +273,11 @@ def arrival(request):
             res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status = 3 )
             if len(res)>0:
                 models.vehicle_info.objects.filter(car_num=carNum).update(end_time=str(datetime.now()) )
-            result = '{' + param.conformMsg.format(13) + '}'
-            return HttpResponse(result)
+
+            res = models.app_task.objects.filter( pid = res[0].pid, task_status=4 )
+            if len(res) > 0:
+                result = '{' + param.conformMsg.format(13) + '}'
+                return HttpResponse(result)
 
     result = '{' + param.conformMsg.format(1) + '}'
     return HttpResponse(result)

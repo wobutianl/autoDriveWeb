@@ -40,7 +40,7 @@ def update(request):
     # to know whether the pid have task all in able
     if len(res) > 0:
         # print("pid", pid)
-        models.app_task.objects.filter( pid_id=pid ).update(lon=lon, lat=lat)
+        models.app_task.objects.filter( pid_id=pid ).update(lon=lon, lat=lat, task_type = taskType, task_status = taskStatus)
         '''
         have task : 
             get 1,0, check car getTask, if get return 1,1 tasklist(without path) else return 0
@@ -53,7 +53,7 @@ def update(request):
                      (two task : change two of the task )
         ''' 
         if taskType == 1 and taskStatus == 0:
-            models.app_task.filter(pid = pid).update(have_task = 1)
+            models.app_task.filter(pid = pid).update(have_task = 1, task_type = taskType, task_status = taskStatus)
         if taskType == 2 and taskStatus == 4:
             models.task_info.objects.filter(car_num=carNum).delete()
             
@@ -64,7 +64,7 @@ def update(request):
             result = '{' + param.conformMsg.format( 0 ) + '}'
     else:
         # need create app task 
-        models.app_task.objects.create(pid = pid, lon = lon, lat = lat)
+        models.app_task.objects.create(pid = pid, lon = lon, lat = lat, task_type = taskType, task_status = taskStatus)
         result = '{' + param.conformMsg.format( 0 ) + '}'
 
     return HttpResponse(result)
