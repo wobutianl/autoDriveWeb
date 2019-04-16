@@ -81,7 +81,7 @@ def makeTaskList( pid, taskType, taskStatus ):
     price = res[0].price
     taskList = []
     if len(res) == 1:
-        print( str(taskStatus)  +  "    " + str(res[0].task_status) )
+        # print( str(taskStatus)  +  "    " + str(res[0].task_status) )
         veh_res = models.vehicle_info.objects.filter(car_num=res[0].car_num)
         taskjson = param.taskListJson
         taskjson[param.current_task_name] = res[0].current_task

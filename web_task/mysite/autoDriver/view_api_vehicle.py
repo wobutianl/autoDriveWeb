@@ -25,11 +25,10 @@ def update(request):
         available = request.GET.get('available', default=1)
         lon = request.GET.get('lon', default=0)
         lat = request.GET.get('lat', default=0)
-
-
-
-
-
+        battery = request.GET.get('battery', default=0)
+        velocity = request.GET.get('velocity', default=0)
+        estimateTime = request.GET.get('estimateTime', default=0)
+        odometry = request.GET.get('odometry', default=0)
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
@@ -169,10 +168,7 @@ def getTask(request):
             return HttpResponse(result)
         
 
-    # result = '{' + param.conformMsg.format(1) + '}'
-    #print("resp get taskType:", taskType)
-    #print("resp get taskStatus:", taskStatus)
-    result = {'taskType': taskType, 'taskStatus': taskStatus }
+    result = '{' + param.conformMsg.format(1) + '}'
     return HttpResponse(json.dumps(result))
     pass
 
