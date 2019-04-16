@@ -2,7 +2,7 @@ conformMsg = ''' "result":{} '''
 webToVehicle = ''' "tid":{}, "lat":{}, "lon":{} '''
 
 webToApp = ''' "result":{}, "transferPoint":{}, "taskList":{}, "price":{}  '''
-taskListJson = { "currentTask":1, "vid": "", "taskType":0, "taskStatus":0, "vehicleLon":0, "vehicleLat":0, "estimateTime":0, "odometry":0, "path":[] }
+taskListJson = { "currentTask":1, "vid": "", "taskType":0, "taskStatus":0, "vehicleLon":0, "vehicleLat":0, "estimateTime":0, "odometry":0, "path":[], "car_park_enable_status":0 }
 
 RESERVER_TYPE = 1
 GO_TYPE = 2
@@ -25,3 +25,5 @@ lat_name = "vehicleLat"
 estimate_name = "estimateTime"
 odometry_name = "odometry"
 path_name = "path"
+app_park_enable_status_name = "app_park_enable_status"
+car_park_enable_status_name = "car_park_enable_status"

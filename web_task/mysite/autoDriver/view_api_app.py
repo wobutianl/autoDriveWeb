@@ -30,6 +30,7 @@ def update(request):
         lat = request.GET.get('lat', default='0.0')
         taskType = request.GET.get('taskType', default='0')
         taskStatus = request.GET.get('taskStatus', default='0')
+        app_park_enable_status = request.GET.get('app_park_enable_status', default='0')
 
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
@@ -40,7 +41,8 @@ def update(request):
     # to know whether the pid have task all in able
     if len(res) > 0:
         # print("pid", pid)
-        models.app_task.objects.filter( pid_id=pid ).update(lon=lon, lat=lat, task_type = taskType, task_status = taskStatus)
+        models.app_task.objects.filter( pid_id=pid ).update(lon=lon, lat=lat, 
+            task_type = taskType, task_status = taskStatus )
         '''
         have task : 
             get 1,0, check car getTask, if get return 1,1 tasklist(without path) else return 0
@@ -53,18 +55,21 @@ def update(request):
                      (two task : change two of the task )
         ''' 
         if taskType == 1 and taskStatus == 0:
-            models.app_task.filter(pid = pid).update(have_task = 1, task_type = taskType, task_status = taskStatus)
-        if taskType == 2 and taskStatus == 4:
-            models.task_info.objects.filter(car_num=carNum).delete()
+            models.app_task.filter(pid = pid).update( have_task = 1 )
+        #if taskType == 2 and taskStatus == 4:
+            # models.task_info.objects.filter(car_num=carNum).delete()
             
         res = models.task_info.objects.filter( pid = pid )
         if len(res) > 0:
+            models.task_info.objects.filter( pid_id=pid, current_task = 1 ).update(
+                app_park_enable_status=app_park_enable_status )
             result = makeTaskList(pid, taskType, taskStatus)
         else :
             result = '{' + param.conformMsg.format( 0 ) + '}'
     else:
         # need create app task 
-        models.app_task.objects.create(pid = pid, lon = lon, lat = lat, task_type = taskType, task_status = taskStatus)
+        models.app_task.objects.create(pid = pid, lon = lon, lat = lat, 
+                task_type = taskType, task_status = taskStatus)
         result = '{' + param.conformMsg.format( 0 ) + '}'
 
     return HttpResponse(result)
@@ -92,6 +97,7 @@ def makeTaskList( pid, taskType, taskStatus ):
         taskjson[param.lat_name] = veh_res[0].lat
         taskjson[param.estimate_name] = veh_res[0].estimate_time
         taskjson[param.odometry_name] = veh_res[0].odometry
+        taskjson[param.car_park_enable_status_name] = res[0].car_park_enable_status
         # taskjson[param.path_name] = res[0].path
             
         if int(taskStatus) == 1 and int(res[0].task_status) == 1 :
@@ -127,6 +133,7 @@ def makeTaskList( pid, taskType, taskStatus ):
                 taskjson[param.estimate_name] = veh_res[0].estimate_time
                 taskjson[param.odometry_name] = veh_res[0].odometry
                 taskjson[param.path_name] = [] #t.path
+                taskjson[param.car_park_enable_status_name] = t.car_park_enable_status
 
                 taskList.append(taskjson)
             pass
@@ -143,6 +150,7 @@ def makeTaskList( pid, taskType, taskStatus ):
                 taskjson[param.estimate_name] = veh_res[0].estimate_time
                 taskjson[param.odometry_name] = veh_res[0].odometry
                 taskjson[param.path_name] = t.path
+                taskjson[param.car_park_enable_status_name] = t.car_park_enable_status
 
                 taskList.append(taskjson)
         else:
@@ -158,6 +166,7 @@ def makeTaskList( pid, taskType, taskStatus ):
                 taskjson[param.estimate_name] = veh_res[0].estimate_time
                 taskjson[param.odometry_name] = veh_res[0].odometry
                 taskjson[param.path_name] = [] #t.path
+                taskjson[param.car_park_enable_status_name] = t.car_park_enable_status
 
                 taskList.append(taskjson)
     result = '{' +  result.format(0, transferPoints, taskList, price) + '}'
@@ -491,5 +500,3 @@ def vehicleList(request):
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
-
-    pass

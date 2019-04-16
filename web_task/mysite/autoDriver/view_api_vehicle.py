@@ -29,12 +29,14 @@ def update(request):
         velocity = request.GET.get('velocity', default=0)
         estimateTime = request.GET.get('estimateTime', default=0)
         odometry = request.GET.get('odometry', default=0)
+        car_park_enable_status = request.GET.get("car_park_enable_status", default=0)
     else :
         result = '{' + param.conformMsg.format( ' request error ') + '}'
         return HttpResponse(result)
 
     taskType = 0
     taskStatus = 0
+    app_status = 0
     v_res = models.vehicle_info.objects.filter( car_num = carNum, vehicle_type=vehicleType)
     # print("the lens of vehicle ", len(v_res), carNum, vehicleType)
     if len(v_res) == 0: # register in db
@@ -45,56 +47,32 @@ def update(request):
         if len(t_res)>0:
             taskType = t_res[0].task_type
             taskStatus = t_res[0].task_status
-            #print("taskType:", taskType)
-            #print("taskStatus:", taskStatus)
-            # print("the car have task ")
+            app_status = t_res[0].app_park_enable_status
+
             models.vehicle_info.objects.filter( car_num=carNum ).update(
                         lon=lon, lat=lat,available = available, battery=battery, velocity = velocity,
-                    estimate_time=estimateTime, odometry=odometry , have_task = 1)
-                # res = models.task_info.objects.filter( car_num = carNum )
-            # when task belong to 1 0 , the first time to get task 
+                    estimate_time=estimateTime, odometry=odometry , have_task = 1, car_park_enable_status=car_park_enable_status)
 
-            res = models.task_info.objects.filter( car_num = carNum, task_type=1, task_status=0 ) # end_status=0, 
+            res = models.task_info.objects.filter( car_num = carNum, task_type=1 ) # end_status=0, 
             if len(res)>0:
-                result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status , 'lon': res[0].start_lon, 'lat': res[0].start_lat }
-                #print ("start_lon", res[0].start_lon)
-                #print("start_lat", res[0].start_lat)
+                result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status , 'lon': res[0].start_lon, 'lat': res[0].start_lat
+                , 'app_park_enable_status': app_status }
                 return HttpResponse( json.dumps(result) )
 
-            #res = models.task_info.objects.filter(car_num=carNum, task_type=1 ) # end_status=0, , task_status = 0
-            #if len(res) > 0:
-            #    result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status}
-            #    # print('get task', result)
-            #    return HttpResponse( json.dumps(result) )
-
-            res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status = 0 ) # end_status=0, 
+            res = models.task_info.objects.filter(car_num=carNum, task_type=2 ) # end_status=0, 
             if len(res) > 0:
-                result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status, 'lon': res[0].end_lon, 'lat': res[0].end_lat}
+                result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status, 'lon': res[0].end_lon, 'lat': res[0].end_lat
+                , 'app_park_enable_status': app_status }
                 # print("end_lon", res[0].end_lon)
                 return HttpResponse( json.dumps(result) )
-
-            res = models.task_info.objects.filter(car_num=carNum, task_type=2, task_status=1) # end_status=0, 
-            if len(res) > 0:
-                result = {'taskType': res[0].task_type, 'taskStatus': res[0].task_status}
-                #print('run, ',result)
-                return HttpResponse( json.dumps(result) )
-            
-            #res = models.task_info.objects.filter(car_num=carNum, task_status=4) # end_status=0, 
-            #if len(res) > 0:
-            #    models.task_info.objects.filter(car_num=carNum).delete()
-            #    result = {'taskType': 0, 'taskStatus':0}
-            #    return HttpResponse(json.dumps(result))
 
             res = models.task_info.objects.filter(car_num=carNum, task_type=4 )
             if len(res)>0:
                 models.task_info.objects.filter(car_num=carNum).delete()
-                result = {'taskType': 0, 'taskStatus':0}
+                result = {'taskType': 0, 'taskStatus':0, 'app_park_enable_status': 0}
                 return HttpResponse(json.dumps(result))
                     
-            result = {'taskType': taskType, 'taskStatus': taskStatus }
-            #print("resp update taskType:", taskType)
-            #print("resp update taskStatus:", taskStatus)
-            #print('no special', result)
+            result = {'taskType': taskType, 'taskStatus': taskStatus, 'app_park_enable_status': app_status }
             return HttpResponse( json.dumps(result) )
             
         else : # have no task 
@@ -104,36 +82,18 @@ def update(request):
  
          # vehicle arrivaled beyonged 2mintes
         if int(v_res[0].have_task) == 1 and v_res[0].end_time != '0' :
-            # res = models.task_info.objects.filter( car_num = carNum, end_status=0 )
-            # if len(res)>0:
-            #     if res[0].task_type == 2 and res[0].task_status == 4:
             cur_time = datetime.now()
-            # print(cur_time)
-            # print(utils.str2datetime(v_res[0].end_time) )
-            # print( (cur_time - utils.str2datetime(v_res[0].end_time) ).seconds )
+
             if  (cur_time - utils.str2datetime(v_res[0].end_time) ).seconds > 120:
                 models.vehicle_info.objects.filter(car_num=carNum).update(
                     lon=lon, lat=lat, available=available, battery=battery, velocity = velocity,
-                    estimate_time=0.0, odometry=0.0 ,have_task = 0, end_time='0' )
+                    estimate_time=0.0, odometry=0.0 ,have_task = 0, end_time='0', app_park_enable_status=0 )
                
-    #print("resp update taskType:", taskType)
-    #print("resp update taskStatus:", taskStatus)
-    result = {'taskType': taskType, 'taskStatus': taskStatus }
+    result = {'taskType': taskType, 'taskStatus': taskStatus, 'app_park_enable_status': app_status }
     # print(result)
     return HttpResponse( json.dumps(result) )
     pass
 
-
-# error 
-def makeVehicleTask(taskType, taskStatus):
-    '''
-    0 0 : have task then 1, 0 and end lon lat 
-    1 0 : result 0 , 1 0 and task []
-    1 2 : result 0 , 1 1 then begin () 
-    1 3 :
-    1 4 : get 1 4 then back to 1 0 
-    '''
-    pass
 
 # get the task : 1,1
 @csrf_exempt
@@ -197,7 +157,8 @@ def begin(request):
         # update task table
         res = models.task_info.objects.filter(car_num = carNum, task_type__in=[1,2,3], task_status=1)
         if len(res) > 0 :
-            models.task_info.objects.filter(car_num=carNum).update( task_status=2, path = path  ) 
+            models.task_info.objects.filter(car_num=carNum).update( task_status=2, path=[]  ) 
+            models.task_info.objects.filter(car_num=carNum).update( task_status=2, path=path  ) 
 
             res = models.app_task.objects.filter(pid = res[0].pid, task_status=2)
             if len(res) > 0:

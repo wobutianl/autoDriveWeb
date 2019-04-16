@@ -59,5 +59,7 @@ urlpatterns = [
     path('/nullmax_vehicle_info/', views.nullmax_vehicle_info, name='nullmax_vehicle_info'),
     path('/cancel_task/<str:carnum>/', views.cancel_task, name='cancel_task'),
     path('/show_info/<str:carnum>/', views.show_info, name='show_info'),
+
+    ################################   event  ##########################
     
 ]

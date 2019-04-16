@@ -72,6 +72,8 @@ class task_info(models.Model):
     task_type = models.IntegerField(default=0)
     task_status = models.IntegerField(default=0)
     # end_status = models.IntegerField(default=0)
+    app_park_enable_status = models.IntegerField(default=0)
+    car_park_enable_status = models.IntegerField(default=0)
 
     def __str__(self):
         return ''
